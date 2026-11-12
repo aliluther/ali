@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streamer OBS Overlay Generator - ALI Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Expanded Google Fonts Selection (10+ Fonts) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alfa+Slab+One&family=Anton&family=Archivo+Black&family=Audiowide&family=Bangers&family=Bai+Jamjuree:wght@700&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cairo:wght@900&family=Chakra+Petch:wght@700&family=Changa:wght@800&family=Creepster&family=Do+Hyeon&family=Exo+2:wght@700;800;900&family=Fira+Code:wght@700&family=Fredoka:wght@700&family=Gugi&family=Inter:wght@700;800;900&family=Kanit:wght@700;800&family=League+Spartan:wght@700;800;900&family=Lilita+One&family=Luckiest+Guy&family=Montserrat:wght@700;800;900&family=Nunito:wght@900&family=Orbitron:wght@700;800;900&family=Oswald:wght@700&family=Patua+One&family=Permanent+Marker&family=Play:wght@700&family=Poppins:wght@700;800;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Righteous&family=Roboto:wght@700;900&family=Rubik:wght@700;800;900&family=Russo+One&family=Saira:wght@800&family=Saira+Condensed:wght@700&family=Share+Tech+Mono&family=Silkscreen&family=Space+Grotesk:wght@700&family=Staatliches&family=Teko:wght@700&family=Titan+One&family=Ubuntu:wght@700&family=VT323&display=swap">
+    <script>
+        function goHome() {
+            const ov = document.getElementById('loadOverlay');
+            if (ov) ov.style.display = 'flex';
+            setTimeout(() => {
+                if (ov) ov.style.display = 'none';
+                try { window.parent.postMessage('ali-go-home', '*'); } catch (e) {}
+                try { window.top.postMessage('ali-go-home', '*'); } catch (e) {}
+            }, 500);
+        }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obs: {
+                            bg: '#0a0a14',
+                            panel: '#12121f',
+                            card: '#1a1a2e',
+                            accent: '#6c5ce7',
+                            accentHover: '#8e7cf3',
+                            border: '#2a2a45'
+                        }
+                    },
+                    fontFamily: {
+                        montserrat: ['Montserrat', 'sans-serif'],
+                        mono: ['Share Tech Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #12121f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4B5563;
+        }
+        
+        /* Checkerboard pattern for transparent preview background */
+        .bg-checkerboard {
+            background-color: #111827;
+            background-image: 
+                linear-gradient(45deg, #1f2937 25%, transparent 25%), 
+                linear-gradient(-45deg, #1f2937 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1f2937 75%), 
+                linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+    </style>
+</head>
+<body class="bg-obs-bg text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-violet-500 selection:text-white">
+
+    <!-- Loading Overlay -->
+    <div id="loadOverlay" style="position:fixed; inset:0; z-index:20000; display:none; align-items:center; justify-content:center; background:rgba(10,10,20,.92);">
+      <div style="text-align:center;">
+        <div style="width:64px; height:64px; margin:0 auto 20px; border-radius:50%; border:5px solid rgba(162,155,254,.2); border-top-color:#a29bfe; animation:spinHome 1s linear infinite;"></div>
+        <div style="font-size:14px; font-weight:700; color:rgba(255,255,255,.85); letter-spacing:1px;">KEMBALI KE HALAMAN UTAMA...</div>
+        <div style="font-size:12px; color:rgba(255,255,255,.45); margin-top:6px;">Mohon tunggu sebentar ya 😊</div>
+      </div>
+    </div>
+    <style>@keyframes spinHome { to { transform:rotate(360deg); } } #loadOverlay.show { display:flex; }</style>
+
+    <!-- Header Navigation -->
+    <header class="bg-obs-panel border-b border-obs-border px-6 py-4 flex items-center justify-between shrink-0 shadow-md gap-4">
+        <a href="#" onclick="goHome(); return false;" class="flex items-center gap-2 px-4 py-2.5 bg-obs-card border border-obs-border hover:border-violet-500 text-gray-200 hover:text-white font-bold text-sm rounded-lg transition-all active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Kembali ke Halaman Utama
+        </a>
+        <div class="flex-1 text-center">
+            <h1 class="text-lg font-black tracking-wide text-white whitespace-nowrap">🎬 OBS / Steam <span class="text-violet-400">Overlay Generator</span></h1>
+            <p class="text-[10px] text-gray-500 font-medium tracking-widest uppercase -mt-0.5">project by ali</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Donation Button to the left of Download -->
+            <a href="#" onclick="openDonasiModal(); return false;" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-sm rounded-lg transition-all shadow-lg shadow-amber-500/25 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Donasi
+            </a>
+
+            <!-- Simplified Download Button -->
+            <button id="btnOpenDownloadModal" onclick="openDownloadModal()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-lg transition-all shadow-lg shadow-emerald-600/25 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download
+            </button>
+        </div>
+    </header>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-20 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-[-10px]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toastMsg" class="text-sm font-medium">Notification</span>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Left Panel: Control Form Settings -->
+        <aside class="w-full lg:w-[450px] xl:w-[480px] bg-obs-panel border-r border-obs-border flex flex-col shrink-0 overflow-y-auto">
+            <div class="p-5 space-y-6">
+                
+                <!-- Section 1: Konten Teks -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Konten Teks & Link
+                    </h2>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Username / Nama Pengguna</label>
+                        <input type="text" id="cfgUsername" value="username / nama pengguna" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500 transition-colors" oninput="renderOverlay()">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Link Saweran</label>
+                        <input type="text" id="cfgTipLink" value="https://yapp.ink/fadlilaly/tip" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500 transition-colors" oninput="renderOverlay()">
+                    </div>
+
+                    <!-- Tombol Manual Preview Slide -->
+                    <div class="pt-2 border-t border-obs-border space-y-2">
+                        <span class="block text-xs font-semibold text-gray-400">Preview Khusus Slide:</span>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="previewSlideMode('social')" id="btnPrevSocial" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+                                👤 Username
+                            </button>
+                            <button onclick="previewSlideMode('tip')" id="btnPrevTip" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+                                💸 Link Saweran
+                            </button>
+                            <button onclick="previewSlideMode('auto')" id="btnPrevAuto" class="px-2 py-1.5 bg-violet-600 text-xs text-white font-bold rounded-lg transition-all flex items-center justify-center gap-1 shadow">
+                                🔄 Auto Loop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Toggle Sosial Media -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        Pilihan Platform Sosial Media
+                    </h2>
+                    <p class="text-xs text-gray-400">Aktifkan platform yang ingin ditampilkan bergiliran di samping username:</p>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="flex items-center gap-2.5 p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer hover:border-gray-600 transition-all">
+                            <input type="checkbox" id="platYoutube" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay()">
+                            <span class="text-xs font-medium text-white flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span> YouTube
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer hover:border-gray-600 transition-all">
+                            <input type="checkbox" id="platInstagram" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay()">
+                            <span class="text-xs font-medium text-white flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-pink-600"></span> Instagram
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer hover:border-gray-600 transition-all">
+                            <input type="checkbox" id="platTiktok" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay()">
+                            <span class="text-xs font-medium text-white flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-gray-200"></span> TikTok
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer hover:border-gray-600 transition-all">
+                            <input type="checkbox" id="platTwitch" class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay()">
+                            <span class="text-xs font-medium text-white flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Twitch
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section 3: Tata Letak, Ukuran & Fonts -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Posisi, Gaya Font & Ukuran
+                    </h2>
+
+                    <!-- 10+ Google Fonts Selection Dropdown -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Gaya Font Overlay (10+ Pilihan)</label>
+                        <select id="cfgFontFamily" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors font-medium" onchange="renderOverlay()">
+                            <option value="'Montserrat', sans-serif" selected style="font-family: 'Montserrat', sans-serif;">Montserrat (Clean Bold)</option>
+                            <option value="'Poppins', sans-serif" style="font-family: 'Poppins', sans-serif;">Poppins (Modern Geometric)</option>
+                            <option value="'Inter', sans-serif" style="font-family: 'Inter', sans-serif;">Inter (Minimalist)</option>
+                            <option value="'Roboto', sans-serif" style="font-family: 'Roboto', sans-serif;">Roboto (Standard Clean)</option>
+                            <option value="'Oswald', sans-serif" style="font-family: 'Oswald', sans-serif;">Oswald (Tall Condensed)</option>
+                            <option value="'Bebas Neue', sans-serif" style="font-family: 'Bebas Neue', sans-serif;">Bebas Neue (Streamer Bold)</option>
+                            <option value="'Share Tech Mono', monospace" style="font-family: 'Share Tech Mono', monospace;">Share Tech Mono (Gaming Tech)</option>
+                            <option value="'Rajdhani', sans-serif" style="font-family: 'Rajdhani', sans-serif;">Rajdhani (Esports Cyber)</option>
+                            <option value="'League Spartan', sans-serif" style="font-family: 'League Spartan', sans-serif;">League Spartan (Heavy Block)</option>
+                            <option value="'Fira Code', monospace" style="font-family: 'Fira Code', monospace;">Fira Code (Developer/Gamer)</option>
+                            <option value="'Anton', sans-serif" style="font-family: 'Anton', sans-serif;">Anton (Bold Poster)</option>
+                            <option value="'Orbitron', sans-serif" style="font-family: 'Orbitron', sans-serif;">Orbitron (Futuristic)</option>
+                            <option value="'Russo One', sans-serif" style="font-family: 'Russo One', sans-serif;">Russo One (Esports Logo)</option>
+                            <option value="'Audiowide', sans-serif" style="font-family: 'Audiowide', sans-serif;">Audiowide (Retro Tech)</option>
+                            <option value="'Press Start 2P', monospace" style="font-family: 'Press Start 2P', monospace;">Press Start 2P (Retro Game)</option>
+                            <option value="'Teko', sans-serif" style="font-family: 'Teko', sans-serif;">Teko (Tall Slim)</option>
+                            <option value="'Kanit', sans-serif" style="font-family: 'Kanit', sans-serif;">Kanit (Bold Modern)</option>
+                            <option value="'Rubik', sans-serif" style="font-family: 'Rubik', sans-serif;">Rubik (Rounded Bold)</option>
+                            <option value="'Exo 2', sans-serif" style="font-family: 'Exo 2', sans-serif;">Exo 2 (Sci-Fi Clean)</option>
+                            <option value="'Righteous', sans-serif" style="font-family: 'Righteous', sans-serif;">Righteous (Retro Display)</option>
+                            <option value="'Abril Fatface', serif">Abril Fatface (Elegant Bold)</option>
+                            <option value="'Alfa Slab One', serif">Alfa Slab One (Slab Heavy)</option>
+                            <option value="'Archivo Black', sans-serif">Archivo Black (Extra Bold)</option>
+                            <option value="'Bangers', cursive">Bangers (Comic Impact)</option>
+                            <option value="'Black Ops One', cursive">Black Ops One (Military)</option>
+                            <option value="'Bungee', sans-serif">Bungee (Urban Sign)</option>
+                            <option value="'Bungee Shade', sans-serif">Bungee Shade (3D Shadow)</option>
+                            <option value="'Chakra Petch', sans-serif">Chakra Petch (Techno)</option>
+                            <option value="'Creepster', cursive">Creepster (Horror)</option>
+                            <option value="'Do Hyeon', sans-serif">Do Hyeon (Korean Style)</option>
+                            <option value="'Fredoka', sans-serif">Fredoka (Soft Bold)</option>
+                            <option value="'Gugi', sans-serif">Gugi (Korean Tech)</option>
+                            <option value="'Staatliches', sans-serif">Staatliches (Condensed Caps)</option>
+                            <option value="'Lilita One', cursive">Lilita One (Chunky)</option>
+                            <option value="'Luckiest Guy', cursive">Luckiest Guy (Cartoon)</option>
+                            <option value="'Patua One', serif">Patua One (Slab Serif)</option>
+                            <option value="'Permanent Marker', cursive">Permanent Marker (Marker)</option>
+                            <option value="'Play', sans-serif">Play (Clean Tech)</option>
+                            <option value="'Saira', sans-serif">Saira (Modern Wide)</option>
+                            <option value="'Saira Condensed', sans-serif">Saira Condensed (Narrow)</option>
+                            <option value="'Space Grotesk', sans-serif">Space Grotesk (Geek Modern)</option>
+                            <option value="'Ubuntu', sans-serif">Ubuntu (Friendly Bold)</option>
+                            <option value="'Nunito', sans-serif">Nunito (Rounded Soft)</option>
+                            <option value="'Cairo', sans-serif">Cairo (Arabic Style Bold)</option>
+                            <option value="'Silkscreen', monospace">Silkscreen (Pixel)</option>
+                            <option value="'VT323', monospace">VT323 (Terminal Retro)</option>
+                            <option value="'Monoton', cursive">Monoton (Neon Line)</option>
+                            <option value="'Titan One', cursive">Titan One (Bubble Bold)</option>
+                            <option value="'Bai Jamjuree', sans-serif">Bai Jamjuree (Tech Thai)</option>
+                            <option value="'Changa', sans-serif">Changa (Wide Bold)</option>
+                        </select>
+                    </div>
+
+                    <!-- Import Font dari Local File -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Import Font dari Local File (.ttf / .otf / .woff / .woff2)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="cfgFontFile" accept=".ttf,.otf,.woff,.woff2" class="hidden" onchange="importFontLocal(this)">
+                            <button onclick="document.getElementById('cfgFontFile').click()" class="flex-1 px-3 py-2 bg-obs-bg border border-obs-border hover:border-violet-500 rounded-lg text-xs text-gray-300 font-semibold transition-colors text-left">
+                                📁 Pilih File Font dari Komputer...
+                            </button>
+                            <span id="fontImportStatus" class="text-[10px] text-gray-500">belum ada</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Posisi Overlay Layar</label>
+                        <select id="cfgPosition" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors" onchange="renderOverlay()">
+                            <option value="bottom-center" selected>Bawah Tengah (Default)</option>
+                            <option value="bottom-left">Bawah Kiri</option>
+                            <option value="bottom-right">Bawah Kanan</option>
+                            <option value="top-center">Atas Tengah</option>
+                            <option value="top-left">Atas Kiri</option>
+                            <option value="top-right">Atas Kanan</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Ukuran Font</label>
+                                <span id="lblFontSize" class="text-xs text-violet-400 font-mono">26px</span>
+                            </div>
+                            <input type="range" id="cfgFontSize" min="16" max="48" value="26" class="w-full accent-violet-500" oninput="document.getElementById('lblFontSize').innerText=this.value+'px'; renderOverlay();">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Ukuran Logo</label>
+                                <span id="lblIconSize" class="text-xs text-violet-400 font-mono">28px</span>
+                            </div>
+                            <input type="range" id="cfgIconSize" min="16" max="48" value="28" class="w-full accent-violet-500" oninput="document.getElementById('lblIconSize').innerText=this.value+'px'; renderOverlay();">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Warna & Stroke -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                        Warna & Stroke/Outline
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Warna Username</label>
+                            <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                                <input type="color" id="cfgColorName" value="#ffffff" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="renderOverlay()">
+                                <input type="text" id="txtColorName" value="#ffffff" class="w-full bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorName').value=this.value; renderOverlay();">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Warna Link Saweran</label>
+                            <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                                <input type="color" id="cfgColorTip" value="#ffffff" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="renderOverlay()">
+                                <input type="text" id="txtColorTip" value="#ffffff" class="w-full bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorTip').value=this.value; renderOverlay();">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stroke Toggles -->
+                    <div class="space-y-2 pt-2 border-t border-obs-border">
+                        <label class="flex items-center justify-between p-2 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                            <span class="text-xs font-medium text-gray-300">Aktifkan Stroke (Garis Tepi) Teks</span>
+                            <input type="checkbox" id="cfgTextStroke" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay()">
+                        </label>
+                        <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                            <span class="text-xs font-semibold text-gray-400 flex-1">Warna Stroke (Custom):</span>
+                            <input type="color" id="cfgColorStroke" value="#000000" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="document.getElementById('txtColorStroke').value=this.value; renderOverlay();">
+                            <input type="text" id="txtColorStroke" value="#000000" class="w-20 bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorStroke').value=this.value; renderOverlay();">
+                        </div>
+                        <div class="p-2.5 bg-obs-bg border border-obs-border rounded-lg space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-gray-400">Ukuran Stroke Teks:</span>
+                                <span id="lblStrokeSize" class="text-xs text-violet-400 font-mono">2px</span>
+                            </div>
+                            <input type="range" id="cfgStrokeSize" min="1" max="6" value="2" step="0.5" class="w-full accent-violet-500" oninput="document.getElementById('lblStrokeSize').innerText=this.value+'px'; renderOverlay();">
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="text-xs font-semibold text-gray-400">Ukuran Stroke Logo:</span>
+                                <span id="lblLogoStrokeSize" class="text-xs text-violet-400 font-mono">1.5px</span>
+                            </div>
+                            <input type="range" id="cfgLogoStrokeSize" min="0.5" max="5" value="1.5" step="0.5" class="w-full accent-violet-500" oninput="document.getElementById('lblLogoStrokeSize').innerText=this.value+'px'; renderOverlay();">
+                        </div>
+
+                        <div class="p-2.5 bg-obs-bg border border-obs-border rounded-lg space-y-2">
+                            <span class="text-xs font-semibold text-gray-400 block">Pengaturan Stroke Logo:</span>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer">
+                                    <input type="checkbox" id="strokeYt" class="rounded text-violet-600 focus:ring-0" onchange="renderOverlay()"> YT
+                                </label>
+                                <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer">
+                                    <input type="checkbox" id="strokeIg" class="rounded text-violet-600 focus:ring-0" onchange="renderOverlay()"> IG
+                                </label>
+                                <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer">
+                                    <input type="checkbox" id="strokeTt" checked class="rounded text-violet-600 focus:ring-0" onchange="renderOverlay()"> TikTok
+                                </label>
+                                <label class="flex items-center gap-1 text-xs text-gray-300 cursor-pointer">
+                                    <input type="checkbox" id="strokeTwitch" class="rounded text-violet-600 focus:ring-0" onchange="renderOverlay()"> Twitch
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Durasi & Timing -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Durasi Animasi (Detik)
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Tampil Username</label>
+                                <span id="lblDurSocial" class="text-xs text-violet-400 font-mono">4s</span>
+                            </div>
+                            <input type="range" id="cfgDurSocial" min="1" max="20" value="4" class="w-full accent-violet-500" oninput="document.getElementById('lblDurSocial').innerText=this.value+'s'; renderOverlay();">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Tampil Link Saweran</label>
+                                <span id="lblDurTip" class="text-xs text-violet-400 font-mono">4s</span>
+                            </div>
+                            <input type="range" id="cfgDurTip" min="1" max="20" value="4" class="w-full accent-violet-500" oninput="document.getElementById('lblDurTip').innerText=this.value+'s'; renderOverlay();">
+                        </div>
+                    </div>
+
+                    <!-- Animation Effects - In & Out Separate -->
+                    <div class="pt-3 border-t border-obs-border space-y-3">
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Efek Muncul (In)</label>
+                        <select id="cfgAnimIn" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors" onchange="renderOverlay();">
+                            <option value="slideUp">📤 Slide Up</option>
+                            <option value="slideDown">📥 Slide Down</option>
+                            <option value="slideLeft">⬅️ Slide Left</option>
+                            <option value="slideRight">➡️ Slide Right</option>
+                            <option value="zoom">🔍 Zoom In</option>
+                            <option value="rotate">🔄 Rotate</option>
+                            <option value="elasticBounce">⚡ Elastic Bounce</option>
+                            <option value="fade">💫 Fade</option>
+                            <option value="scale">📏 Scale</option>
+                            <option value="flip">🔀 Flip</option>
+                            <option value="pulse">💓 Pulse</option>
+                        </select>
+
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Efek Hilang (Out)</label>
+                        <select id="cfgAnimOut" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors" onchange="renderOverlay();">
+                            <option value="slideUp">📤 Slide Up</option>
+                            <option value="slideDown">📥 Slide Down</option>
+                            <option value="slideLeft">⬅️ Slide Left</option>
+                            <option value="slideRight">➡️ Slide Right</option>
+                            <option value="zoom">🔍 Zoom Out</option>
+                            <option value="rotate">🔄 Rotate</option>
+                            <option value="fade" selected>💫 Fade</option>
+                            <option value="scale">📏 Scale</option>
+                            <option value="flip">🔀 Flip</option>
+                            <option value="pulse">💓 Pulse</option>
+                        </select>
+
+                        <label class="flex items-center justify-between p-2 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                            <span class="text-xs font-medium text-gray-300">Mulai dari Link Saweran</span>
+                            <input type="checkbox" id="cfgStartWithTip" class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="renderOverlay();">
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Right Panel: Live Preview Screen -->
+        <main class="flex-1 bg-gray-950 flex flex-col p-6 overflow-hidden relative">
+            
+            <!-- Preview Top Controls Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-4 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Preview Canvas
+                    </span>
+                    <span class="text-xs text-gray-500">Scale Responsif</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <!-- Expand 1920x1080 Fullscreen Modal Toggle Button -->
+                    <button onclick="openFullPreviewModal()" class="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg bg-obs-panel border border-obs-border hover:bg-gray-800 text-gray-300 hover:text-white transition-all shadow-sm">
+                        <svg class="w-3.5 h-3.5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                        Perbesar 1920x1080
+                    </button>
+
+                    <!-- Preview Background Switcher -->
+                    <div class="flex items-center gap-1 bg-obs-panel p-1 rounded-lg border border-obs-border">
+                        <button onclick="setBgPreview('checkerboard')" id="btnBgChecker" class="px-3 py-1 text-xs font-medium rounded-md transition-colors bg-violet-600 text-white">Checkerboard</button>
+                        <button onclick="setBgPreview('dark')" id="btnBgDark" class="px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors">Dark Game</button>
+                        <button onclick="setBgPreview('gta')" id="btnBgGta" class="px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors">Gameplay</button>
+                        <button onclick="setBgPreview('white')" id="btnBgWhite" class="px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors">White</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Screen Box -->
+            <div class="flex-1 flex items-center justify-center relative overflow-hidden rounded-xl border border-obs-border shadow-2xl">
+                <div id="previewCanvas" class="w-full h-full relative transition-all duration-300 bg-checkerboard flex items-center justify-center">
+                    
+                    <!-- Realistic GTA FiveM Gameplay Wallpaper Mockup Background Image -->
+                    <div id="gtaMockupBg" class="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-300 pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1920&q=80');"></div>
+                    <div id="darkOverlayBg" class="absolute inset-0 bg-gray-900/40 pointer-events-none"></div>
+
+                    <!-- Dynamic Render Container -->
+                    <div id="previewRenderArea" class="w-full h-full relative">
+                        <!-- Content Injected Dynamically by JavaScript -->
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Bottom Quick Tip -->
+            <div class="mt-4 flex items-center justify-between text-xs text-gray-400 shrink-0">
+                <p>💡 <b>Tips OBS Studio:</b> Pasang file <code class="text-violet-300 font-mono">stream.html</code> sebagai <b>Browser Source</b> di OBS (Width: 1920, Height: 1080).</p>
+                <button onclick="restartPreviewAnimation()" class="text-violet-400 hover:text-violet-300 underline">Restart Animasi Preview</button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal 1: 1920x1080 Full Canvas Preview -->
+    <div id="modalFullPreview" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col p-6 items-center justify-center">
+        <div class="w-full flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span> Simulator Full Preview 1920x1080
+            </h3>
+            <button onclick="closeFullPreviewModal()" class="px-4 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition-colors">
+                Tutup (Esc)
+            </button>
+        </div>
+        <div class="w-full h-full flex items-center justify-center">
+            <div class="w-full h-full aspect-video bg-checkerboard rounded-xl border border-gray-700 relative overflow-hidden shadow-2xl" style="max-width: 1920px; max-height: 1080px;">
+                <div id="fullPreviewRenderArea" class="w-full h-full relative"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Download Countdown & Donation Prompt -->
+    <div id="modalDownload" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-obs-panel border border-obs-border w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-center space-y-5 transform transition-all scale-100">
+            
+            <!-- Close / Exit Button -->
+            <button onclick="closeDownloadModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800/80 hover:bg-gray-700 p-1.5 rounded-lg transition-colors" title="Exit / Tutup">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div class="w-14 h-14 bg-violet-600/20 border border-violet-500/40 rounded-full flex items-center justify-center mx-auto text-violet-400">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </div>
+
+            <div class="space-y-1">
+                <h3 id="modalStatusTitle" class="text-xl font-extrabold text-white">Menyiapkan Download...</h3>
+                <p class="text-xs text-gray-400">File <code class="text-emerald-400 font-mono bg-emerald-950/60 px-2 py-0.5 rounded">stream.html</code> akan terunduh otomatis dalam:</p>
+            </div>
+
+            <!-- Visual Countdown Timer Circle / Text (20 seconds) -->
+            <div class="bg-obs-card border border-obs-border p-4 rounded-xl flex items-center justify-center gap-3">
+                <span id="downloadTimer" class="text-3xl font-black font-mono text-violet-400 animate-pulse">20</span>
+                <span id="downloadTimerUnit" class="text-sm font-semibold text-gray-300">Detik</span>
+            </div>
+
+            <!-- Casual Donation Message Box -->
+            <div class="bg-violet-950/30 border border-violet-800/40 p-4 rounded-xl text-left space-y-2">
+                <p class="text-xs text-gray-300 leading-relaxed">
+                    Overlay ini <b>100% gratis</b> buat kamu pakai! Tapi kalau merasa terbantu dan mau apresiasi/support, bisa kirim saweran seikhlasnya ya (tanpa ada paksaan sama sekali) 🙏
+                </p>
+                <a href="https://yapp.ink/fadlilaly/tip" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-lg transition-all shadow-lg shadow-emerald-900/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Support via Yapp Ink
+                </a>
+            </div>
+
+            <!-- Ringkasan Tutorial Cara Pasang di OBS Studio -->
+            <div class="bg-obs-card border border-obs-border p-3.5 rounded-xl text-left space-y-2">
+                <h4 class="text-xs font-bold text-gray-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Cara Singkat Pasang di OBS:
+                </h4>
+                <ol class="text-xs text-gray-300 space-y-1.5 list-decimal list-inside leading-relaxed">
+                    <li>Buka OBS Studio, tambahkan Source baru <b class="text-violet-300">Browser</b>.</li>
+                    <li>Centang <b class="text-violet-300">Local File</b> lalu pilih file <code class="text-emerald-400 font-mono bg-black/40 px-1 py-0.5 rounded">stream.html</code>.</li>
+                    <li>Atur Width: <b class="text-violet-300">1920</b> & Height: <b class="text-violet-300">1080</b>, lalu klik OK.</li>
+                </ol>
+            </div>
+
+            <!-- Manual Download Action & Exit Option -->
+            <div class="space-y-2 pt-1 border-t border-obs-border">
+                <button id="btnManualDownload" disabled onclick="triggerImmediateDownload()" class="w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold text-xs rounded-lg transition-all shadow-md">
+                    Download Sekarang <span id="btnManualNotice">(Tunggu min. 10s)</span>
+                </button>
+                <button onclick="closeDownloadModal()" class="w-full py-2 text-xs text-gray-400 hover:text-gray-200 font-medium transition-colors">
+                    Tutup / Exit
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Icons SVG Repository (Including Twitch)
+        const SVGS = {
+            youtube: `<svg class="social-icon icon-youtube" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+            instagram: `<svg class="social-icon icon-instagram" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+            tiktok: `<svg class="social-icon icon-tiktok" viewBox="0 0 24 24" fill="#ffffff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 3 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>`,
+            twitch: `<svg class="social-icon icon-twitch" viewBox="0 0 24 24" fill="#9146FF"><path d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>`
+        };
+
+        let timerInterval = null;
+        let downloadedState = false;
+        let currentSlideOverride = 'auto'; // 'auto', 'social', or 'tip'
+
+        function previewSlideMode(mode) {
+            currentSlideOverride = mode;
+            
+            const btnSocial = document.getElementById('btnPrevSocial');
+            const btnTip = document.getElementById('btnPrevTip');
+            const btnAuto = document.getElementById('btnPrevAuto');
+
+            btnSocial.className = "px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all flex items-center justify-center gap-1";
+            btnTip.className = "px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all flex items-center justify-center gap-1";
+            btnAuto.className = "px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all flex items-center justify-center gap-1";
+
+            if (mode === 'social') {
+                btnSocial.className = "px-2 py-1.5 bg-violet-600 text-xs text-white font-bold rounded-lg transition-all flex items-center justify-center gap-1 shadow";
+            } else if (mode === 'tip') {
+                btnTip.className = "px-2 py-1.5 bg-violet-600 text-xs text-white font-bold rounded-lg transition-all flex items-center justify-center gap-1 shadow";
+            } else {
+                btnAuto.className = "px-2 py-1.5 bg-violet-600 text-xs text-white font-bold rounded-lg transition-all flex items-center justify-center gap-1 shadow";
+            }
+
+            renderOverlay();
+        }
+
+        // Switch Preview Background
+        function setBgPreview(type) {
+            const canvas = document.getElementById('previewCanvas');
+            const gtaBg = document.getElementById('gtaMockupBg');
+            const btnChecker = document.getElementById('btnBgChecker');
+            const btnDark = document.getElementById('btnBgDark');
+            const btnGta = document.getElementById('btnBgGta');
+            const btnWhite = document.getElementById('btnBgWhite');
+
+            canvas.className = "w-full h-full relative transition-all duration-300 flex items-center justify-center ";
+            gtaBg.style.opacity = '0';
+
+            btnChecker.className = "px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors";
+            btnDark.className = "px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors";
+            btnGta.className = "px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors";
+            btnWhite.className = "px-3 py-1 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-colors";
+
+            if (type === 'checkerboard') {
+                canvas.classList.add('bg-checkerboard');
+                btnChecker.className = "px-3 py-1 text-xs font-medium rounded-md bg-violet-600 text-white transition-colors";
+            } else if (type === 'dark') {
+                canvas.classList.add('bg-gray-950');
+                btnDark.className = "px-3 py-1 text-xs font-medium rounded-md bg-violet-600 text-white transition-colors";
+            } else if (type === 'gta') {
+                canvas.classList.add('bg-gray-950');
+                gtaBg.style.opacity = '1';
+                btnGta.className = "px-3 py-1 text-xs font-medium rounded-md bg-violet-600 text-white transition-colors";
+            } else if (type === 'white') {
+                canvas.classList.add('bg-white');
+                btnWhite.className = "px-3 py-1 text-xs font-medium rounded-md bg-violet-600 text-white transition-colors";
+            }
+        }
+
+        // Import font dari local file
+        async function importFontLocal(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const status = document.getElementById('fontImportStatus');
+            try {
+                const buf = await file.arrayBuffer();
+                const family = file.name.replace(/\.[^.]+$/, '').replace(/[^\w\- ]/g, '').trim() || 'Custom Font';
+                const font = new FontFace(family, buf);
+                await font.load();
+                document.fonts.add(font);
+                const sel = document.getElementById('cfgFontFamily');
+                const val = "'" + family + "', sans-serif";
+                let opt = Array.from(sel.options).find(o => o.value === val);
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = '📁 ' + family + ' (Imported)';
+                    sel.appendChild(opt);
+                }
+                sel.value = val;
+                status.textContent = '✓ ' + file.name;
+                status.className = 'text-[10px] text-emerald-400';
+                renderOverlay();
+            } catch (err) {
+                status.textContent = '✗ gagal';
+                status.className = 'text-[10px] text-red-400';
+            }
+        }
+
+        // Get Configuration State
+        function getConfig() {
+            return {
+                username: document.getElementById('cfgUsername').value || 'username / nama pengguna',
+                tipLink: document.getElementById('cfgTipLink').value || 'https://yapp.ink/fadlilaly/tip',
+                fontFamily: document.getElementById('cfgFontFamily').value,
+                platforms: {
+                    youtube: document.getElementById('platYoutube').checked,
+                    instagram: document.getElementById('platInstagram').checked,
+                    tiktok: document.getElementById('platTiktok').checked,
+                    twitch: document.getElementById('platTwitch').checked,
+                },
+                position: document.getElementById('cfgPosition').value,
+                fontSize: document.getElementById('cfgFontSize').value,
+                iconSize: document.getElementById('cfgIconSize').value,
+                colorName: document.getElementById('cfgColorName').value,
+                colorTip: document.getElementById('cfgColorTip').value,
+                textStroke: document.getElementById('cfgTextStroke').checked,
+                strokeSize: parseFloat(document.getElementById('cfgStrokeSize').value) || 2,
+                logoStrokeSize: parseFloat(document.getElementById('cfgLogoStrokeSize').value) || 1.5,
+                strokeColor: document.getElementById('cfgColorStroke').value || '#000000',
+                strokeYoutube: document.getElementById('strokeYt').checked,
+                strokeInstagram: document.getElementById('strokeIg').checked,
+                strokeTiktok: document.getElementById('strokeTt').checked,
+                strokeTwitch: document.getElementById('strokeTwitch').checked,
+                durSocial: parseInt(document.getElementById('cfgDurSocial').value) || 4,
+                durTip: parseInt(document.getElementById('cfgDurTip').value) || 4,
+                animIn: document.getElementById('cfgAnimIn')?.value || 'slideUp',
+                animOut: document.getElementById('cfgAnimOut')?.value || 'fade',
+                startWithTip: document.getElementById('cfgStartWithTip')?.checked || false
+            }
+        }
+
+        // Render HTML Overlay structure inside preview containers
+        function renderOverlay() {
+            const cfg = getConfig();
+            const activePlatforms = Object.keys(cfg.platforms).filter(k => cfg.platforms[k]);
+
+            // Synchronize color text inputs with color pickers
+            document.getElementById('txtColorName').value = cfg.colorName;
+            document.getElementById('txtColorTip').value = cfg.colorTip;
+
+            // Generate CSS Positional style
+            let posCSS = 'bottom: 30px; left: 50%; transform: translateX(-50%); text-align: center;';
+            if (cfg.position === 'bottom-left') posCSS = 'bottom: 30px; left: 30px; text-align: left;';
+            if (cfg.position === 'bottom-right') posCSS = 'bottom: 30px; right: 30px; text-align: right;';
+            if (cfg.position === 'top-center') posCSS = 'top: 30px; left: 50%; transform: translateX(-50%); text-align: center;';
+            if (cfg.position === 'top-left') posCSS = 'top: 30px; left: 30px; text-align: left;';
+            if (cfg.position === 'top-right') posCSS = 'top: 30px; right: 30px; text-align: right;';
+
+            const totalDuration = cfg.durSocial + cfg.durTip;
+            const numIcons = activePlatforms.length || 1;
+            const iconDuration = cfg.durSocial;
+
+            // Generate icon animations & HTML
+            let iconAnimationsCSS = '';
+            let iconsHTML = '';
+
+            activePlatforms.forEach((p, idx) => {
+                const startTime = (idx / numIcons) * 100;
+                const visibleTime = ((idx + 0.9) / numIcons) * 100;
+                const endTime = ((idx + 1) / numIcons) * 100;
+                const keyframeName = `showIcon_${p}`;
+                
+                const platformKey = `stroke${p.charAt(0).toUpperCase() + p.slice(1)}`;
+                const hasStroke = cfg[platformKey];
+                const filterValue = hasStroke ? `drop-shadow(-${cfg.logoStrokeSize}px -${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(${cfg.logoStrokeSize}px -${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(-${cfg.logoStrokeSize}px ${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(${cfg.logoStrokeSize}px ${cfg.logoStrokeSize}px 0 ${cfg.strokeColor})` : 'none';
+
+                iconAnimationsCSS += `
+                    .icon-${p} {
+                        animation: ${keyframeName} ${iconDuration}s infinite linear;
+                        filter: ${filterValue};
+                    }
+                    @keyframes ${keyframeName} {
+                        0%, ${startTime > 0 ? startTime - 1 : 0}% { opacity: ${idx === 0 ? 1 : 0}; transform: scale(${idx === 0 ? 1 : 0.9}); }
+                        ${startTime}%, ${visibleTime}% { opacity: 1; transform: scale(1); }
+                        ${endTime}%, 100% { opacity: 0; transform: scale(0.9); }
+                    }
+                `;
+                iconsHTML += SVGS[p] || '';
+            });
+
+            const textStrokeCSS = cfg.textStroke ? `
+                text-shadow: 
+                    -${cfg.strokeSize}px -${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                     ${cfg.strokeSize}px -${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                    -${cfg.strokeSize}px  ${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                     ${cfg.strokeSize}px  ${cfg.strokeSize}px 0 ${cfg.strokeColor},
+                     0px  3px 6px rgba(0, 0, 0, 0.9);
+            ` : 'text-shadow: none;';
+
+            const animShowMs = 300; // 0.3s slide up + fade in
+            const animHideMs = 300; // 0.3s fade out
+            const holdMs = (cfg.durSocial * 1000) - animShowMs - animHideMs; // durasi tampil - animasi masuk - animasi keluar
+
+            const dynamicStyle = `
+                <style>
+                    .overlay-preview-container {
+                        position: absolute;
+                        ${posCSS}
+                        font-family: ${cfg.fontFamily};
+                        white-space: nowrap;
+                        z-index: 20;
+                    }
+
+                    .slide-social-dynamic {
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 22px;
+                        position: absolute;
+                        width: 100%;
+                        left: 0;
+                        right: 0;
+                        ${cfg.position.includes('top') ? 'top: 0;' : 'bottom: 0;'}
+                    }
+
+                    .slide-social-dynamic.active {
+                        display: flex;
+                        animation: slideIn_${cfg.animIn} 0.3s ease-out forwards;
+                    }
+
+                    .slide-social-dynamic.exit {
+                        animation: slideOut_${cfg.animOut} 0.3s ease-in forwards;
+                    }
+
+                    .slide-tip-dynamic {
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        position: absolute;
+                        width: 100%;
+                        left: 0;
+                        right: 0;
+                        ${cfg.position.includes('top') ? 'top: 0;' : 'bottom: 0;'}
+                    }
+
+                    .slide-tip-dynamic.active {
+                        display: flex;
+                        animation: slideIn_${cfg.animIn} 0.3s ease-out forwards;
+                    }
+
+                    .slide-tip-dynamic.exit {
+                        animation: slideOut_${cfg.animOut} 0.3s ease-in forwards;
+                    }
+
+                    /* slideUp - In & Out */
+                    @keyframes slideIn_slideUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes slideOut_slideUp {
+                        from {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                    }
+
+                    /* slideDown - In & Out */
+                    @keyframes slideIn_slideDown {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    @keyframes slideOut_slideDown {
+                        from {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateY(-30px);
+                        }
+                    }
+
+                    /* slideLeft - In & Out */
+                    @keyframes slideIn_slideLeft {
+                        from {
+                            opacity: 0;
+                            transform: translateX(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                    }
+
+                    @keyframes slideOut_slideLeft {
+                        from {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateX(30px);
+                        }
+                    }
+
+                    /* slideRight - In & Out */
+                    @keyframes slideIn_slideRight {
+                        from {
+                            opacity: 0;
+                            transform: translateX(-30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                    }
+
+                    @keyframes slideOut_slideRight {
+                        from {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: translateX(-30px);
+                        }
+                    }
+
+                    /* zoom - In & Out */
+                    @keyframes slideIn_zoom {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.8);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+
+                    @keyframes slideOut_zoom {
+                        from {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: scale(0.8);
+                        }
+                    }
+
+                    /* rotate - In & Out */
+                    @keyframes slideIn_rotate {
+                        from {
+                            opacity: 0;
+                            transform: rotate(-45deg);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: rotate(0deg);
+                        }
+                    }
+
+                    @keyframes slideOut_rotate {
+                        from {
+                            opacity: 1;
+                            transform: rotate(0deg);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: rotate(45deg);
+                        }
+                    }
+
+                    /* elasticBounce - In & Out */
+                    @keyframes slideIn_elasticBounce {
+                        0% {
+                            opacity: 0;
+                            transform: scale(0);
+                        }
+                        50% {
+                            opacity: 1;
+                            transform: scale(1.1);
+                        }
+                        100% {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+
+                    @keyframes slideOut_elasticBounce {
+                        from {
+                            opacity: 1;
+                        }
+                        to {
+                            opacity: 0;
+                        }
+                    }
+
+                    /* fade - In & Out */
+                    @keyframes slideIn_fade {
+                        from {
+                            opacity: 0;
+                        }
+                        to {
+                            opacity: 1;
+                        }
+                    }
+
+                    @keyframes slideOut_fade {
+                        from {
+                            opacity: 1;
+                        }
+                        to {
+                            opacity: 0;
+                        }
+                    }
+
+                    /* scale - In & Out */
+                    @keyframes slideIn_scale {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.7) translateY(20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: scale(1) translateY(0);
+                        }
+                    }
+
+                    @keyframes slideOut_scale {
+                        from {
+                            opacity: 1;
+                            transform: scale(1) translateY(0);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: scale(0.7) translateY(20px);
+                        }
+                    }
+
+                    /* flip - In & Out */
+                    @keyframes slideIn_flip {
+                        from {
+                            opacity: 0;
+                            transform: rotateY(90deg);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: rotateY(0deg);
+                        }
+                    }
+
+                    @keyframes slideOut_flip {
+                        from {
+                            opacity: 1;
+                            transform: rotateY(0deg);
+                        }
+                        to {
+                            opacity: 0;
+                            transform: rotateY(-90deg);
+                        }
+                    }
+
+                    /* pulse - In & Out */
+                    @keyframes slideIn_pulse {
+                        0% {
+                            opacity: 0;
+                            transform: scale(0.9);
+                        }
+                        50% {
+                            opacity: 1;
+                            transform: scale(1.05);
+                        }
+                        100% {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+
+                    @keyframes slideOut_pulse {
+                        0% {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                        50% {
+                            opacity: 0.5;
+                            transform: scale(0.95);
+                        }
+                        100% {
+                            opacity: 0;
+                            transform: scale(0.9);
+                        }
+                    }
+
+                    .tip-text-dynamic {
+                        font-size: ${cfg.fontSize}px;
+                        font-weight: 800;
+                        color: ${cfg.colorTip};
+                        letter-spacing: 1px;
+                        ${textStrokeCSS}
+                    }
+
+                    .icon-container-dynamic {
+                        position: relative;
+                        width: ${cfg.iconSize}px;
+                        height: ${cfg.iconSize}px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .social-icon {
+                        position: absolute;
+                        width: ${cfg.iconSize - 2}px;
+                        height: ${cfg.iconSize - 2}px;
+                        opacity: 0;
+                    }
+
+                    ${iconAnimationsCSS}
+
+                    .name-text-dynamic {
+                        font-size: ${cfg.fontSize}px;
+                        font-weight: 800;
+                        color: ${cfg.colorName};
+                        letter-spacing: 1px;
+                        ${textStrokeCSS}
+                    }
+                </style>
+            `;
+
+            const innerHTML = `
+                ${dynamicStyle}
+                <div class="overlay-preview-container">
+                    <div class="slide-social-dynamic active">
+                        <div class="icon-container-dynamic">
+                            ${iconsHTML}
+                        </div>
+                        <div class="name-text-dynamic">${cfg.username}</div>
+                    </div>
+                    <div class="slide-tip-dynamic">
+                        <div class="tip-text-dynamic">${cfg.tipLink}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('previewRenderArea').innerHTML = innerHTML;
+            const fullArea = document.getElementById('fullPreviewRenderArea');
+            if (fullArea) fullArea.innerHTML = innerHTML;
+
+            // Start JS toggle loop with animations
+            startPreviewToggle(cfg.durSocial, cfg.durTip);
+        }
+
+        // JavaScript-based toggle dengan animasi bergantian sesuai durasi kustom
+        let previewToggleTimer = null;
+        function startPreviewToggle(durSocial, durTip) {
+            if (previewToggleTimer) clearTimeout(previewToggleTimer);
+
+            const socials = document.querySelectorAll('.slide-social-dynamic');
+            const tips = document.querySelectorAll('.slide-tip-dynamic');
+
+            if (!socials.length || !tips.length) return;
+
+            if (currentSlideOverride === 'social') {
+                tips.forEach(el => { el.classList.remove('active', 'exit'); });
+                socials.forEach(el => { el.classList.remove('exit'); el.classList.add('active'); });
+                return;
+            }
+            if (currentSlideOverride === 'tip') {
+                socials.forEach(el => { el.classList.remove('active', 'exit'); });
+                tips.forEach(el => { el.classList.remove('exit'); el.classList.add('active'); });
+                return;
+            }
+
+            const cfg = getConfig();
+            let showingTip = cfg.startWithTip;
+
+            function switchSlide() {
+                if (showingTip) {
+                    tips.forEach(el => { el.classList.remove('active'); el.classList.add('exit'); });
+                    setTimeout(() => {
+                        tips.forEach(el => el.classList.remove('exit'));
+                        socials.forEach(el => el.classList.add('active'));
+                    }, 300);
+                    showingTip = false;
+                    previewToggleTimer = setTimeout(switchSlide, durSocial * 1000);
+                } else {
+                    socials.forEach(el => { el.classList.remove('active'); el.classList.add('exit'); });
+                    setTimeout(() => {
+                        socials.forEach(el => el.classList.remove('exit'));
+                        tips.forEach(el => el.classList.add('active'));
+                    }, 300);
+                    showingTip = true;
+                    previewToggleTimer = setTimeout(switchSlide, durTip * 1000);
+                }
+            }
+
+            if (showingTip) {
+                socials.forEach(el => el.classList.remove('active', 'exit'));
+                tips.forEach(el => el.classList.add('active'));
+                previewToggleTimer = setTimeout(switchSlide, durTip * 1000);
+            } else {
+                tips.forEach(el => el.classList.remove('active', 'exit'));
+                socials.forEach(el => el.classList.add('active'));
+                previewToggleTimer = setTimeout(switchSlide, durSocial * 1000);
+            }
+        }
+
+        // Generate standalone HTML content for stream.html file download
+        function generateHTMLCode() {
+            const cfg = getConfig();
+            const activePlatforms = Object.keys(cfg.platforms).filter(k => cfg.platforms[k]);
+
+            let posCSS = 'bottom: 30px; left: 50%; transform: translateX(-50%); text-align: center;';
+            if (cfg.position === 'bottom-left') posCSS = 'bottom: 30px; left: 30px; text-align: left;';
+            if (cfg.position === 'bottom-right') posCSS = 'bottom: 30px; right: 30px; text-align: right;';
+            if (cfg.position === 'top-center') posCSS = 'top: 30px; left: 50%; transform: translateX(-50%); text-align: center;';
+            if (cfg.position === 'top-left') posCSS = 'top: 30px; left: 30px; text-align: left;';
+            if (cfg.position === 'top-right') posCSS = 'top: 30px; right: 30px; text-align: right;';
+
+            const numIcons = activePlatforms.length || 1;
+            const iconDuration = cfg.durSocial;
+
+            let iconAnimationsCSS = '';
+            let iconsHTML = '';
+
+            activePlatforms.forEach((p, idx) => {
+                const startTime = (idx / numIcons) * 100;
+                const visibleTime = ((idx + 0.9) / numIcons) * 100;
+                const endTime = ((idx + 1) / numIcons) * 100;
+                const keyframeName = `showIcon_${p}`;
+                
+                const platformKey = `stroke${p.charAt(0).toUpperCase() + p.slice(1)}`;
+                const hasStroke = cfg[platformKey];
+                const filterValue = hasStroke ? `drop-shadow(-${cfg.logoStrokeSize}px -${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(${cfg.logoStrokeSize}px -${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(-${cfg.logoStrokeSize}px ${cfg.logoStrokeSize}px 0 ${cfg.strokeColor}) drop-shadow(${cfg.logoStrokeSize}px ${cfg.logoStrokeSize}px 0 ${cfg.strokeColor})` : 'none';
+
+                iconAnimationsCSS += `
+        .icon-${p} {
+            animation: ${keyframeName} ${iconDuration}s infinite linear;
+            filter: ${filterValue};
+        }
+        @keyframes ${keyframeName} {
+            0%, ${startTime > 0 ? startTime - 1 : 0}% { opacity: ${idx === 0 ? 1 : 0}; transform: scale(${idx === 0 ? 1 : 0.9}); }
+            ${startTime}%, ${visibleTime}% { opacity: 1; transform: scale(1); }
+            ${endTime}%, 100% { opacity: 0; transform: scale(0.9); }
+        }
+`;
+                iconsHTML += SVGS[p] || '';
+            });
+
+            const textStrokeCSS = cfg.textStroke ? `
+            text-shadow: 
+                -${cfg.strokeSize}px -${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                 ${cfg.strokeSize}px -${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                -${cfg.strokeSize}px  ${cfg.strokeSize}px 0 ${cfg.strokeColor},  
+                 ${cfg.strokeSize}px  ${cfg.strokeSize}px 0 ${cfg.strokeColor},
+                 0px  3px 6px rgba(0, 0, 0, 0.9);` : 'text-shadow: none;';
+
+            return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>OBS Stream Overlay</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alfa+Slab+One&family=Anton&family=Archivo+Black&family=Audiowide&family=Bangers&family=Bai+Jamjuree:wght@700&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Bungee+Shade&family=Cairo:wght@900&family=Chakra+Petch:wght@700&family=Changa:wght@800&family=Creepster&family=Do+Hyeon&family=Exo+2:wght@700;800;900&family=Fira+Code:wght@700&family=Fredoka:wght@700&family=Gugi&family=Inter:wght@700;800;900&family=Kanit:wght@700;800&family=League+Spartan:wght@700;800;900&family=Lilita+One&family=Luckiest+Guy&family=Montserrat:wght@700;800;900&family=Nunito:wght@900&family=Orbitron:wght@700;800;900&family=Oswald:wght@700&family=Patua+One&family=Permanent+Marker&family=Play:wght@700&family=Poppins:wght@700;800;900&family=Press+Start+2P&family=Rajdhani:wght@700&family=Righteous&family=Roboto:wght@700;900&family=Rubik:wght@700;800;900&family=Russo+One&family=Saira:wght@800&family=Saira+Condensed:wght@700&family=Share+Tech+Mono&family=Silkscreen&family=Space+Grotesk:wght@700&family=Staatliches&family=Teko:wght@700&family=Titan+One&family=Ubuntu:wght@700&family=VT323&display=swap">
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0);
+            margin: 0;
+            padding: 0;
+            font-family: ${cfg.fontFamily};
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .overlay-container {
+            position: absolute;
+            ${posCSS}
+            white-space: nowrap;
+        }
+
+        .slide-social, .slide-tip {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            ${cfg.position.includes('center') ? 'left: 50%; transform: translateX(-50%);' : cfg.position.includes('right') ? 'right: 0;' : 'left: 0;'}
+            ${cfg.position.includes('top') ? 'top: 0;' : 'bottom: 0;'}
+        }
+
+        .slide-social {
+            gap: 22px;
+        }
+
+        .slide-social.active, .slide-tip.active {
+            display: flex;
+            animation: slideIn_${cfg.animIn} 0.3s ease-out forwards;
+        }
+
+        .slide-social.exit, .slide-tip.exit {
+            display: flex;
+            animation: slideOut_${cfg.animOut} 0.3s ease-in forwards;
+        }
+
+        @keyframes slideIn_slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideOut_slideUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(30px); } }
+        @keyframes slideIn_slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideOut_slideDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
+        @keyframes slideIn_slideLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideOut_slideLeft { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+        @keyframes slideIn_slideRight { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideOut_slideRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+        @keyframes slideIn_zoom { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideOut_zoom { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.8); } }
+        @keyframes slideIn_rotate { from { opacity: 0; transform: rotate(-45deg); } to { opacity: 1; transform: rotate(0deg); } }
+        @keyframes slideOut_rotate { from { opacity: 1; transform: rotate(0deg); } to { opacity: 0; transform: rotate(45deg); } }
+        @keyframes slideIn_elasticBounce { 0% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes slideOut_elasticBounce { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideIn_fade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideOut_fade { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideIn_scale { from { opacity: 0; transform: scale(0.7) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes slideOut_scale { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.7) translateY(20px); } }
+        @keyframes slideIn_flip { from { opacity: 0; transform: rotateY(90deg); } to { opacity: 1; transform: rotateY(0deg); } }
+        @keyframes slideOut_flip { from { opacity: 1; transform: rotateY(0deg); } to { opacity: 0; transform: rotateY(-90deg); } }
+        @keyframes slideIn_pulse { 0% { opacity: 0; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes slideOut_pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.95); } 100% { opacity: 0; transform: scale(0.9); } }
+
+        .icon-container {
+            position: relative;
+            width: ${cfg.iconSize}px;
+            height: ${cfg.iconSize}px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .social-icon {
+            position: absolute;
+            width: ${cfg.iconSize - 2}px;
+            height: ${cfg.iconSize - 2}px;
+            opacity: 0;
+        }
+
+        .fadlila-text {
+            font-size: ${cfg.fontSize}px;
+            font-weight: 800;
+            color: ${cfg.colorName};
+            letter-spacing: 1px;
+            ${textStrokeCSS}
+        }
+
+        .tip-text {
+            font-size: ${cfg.fontSize}px;
+            font-weight: 800;
+            color: ${cfg.colorTip};
+            letter-spacing: 1px;
+            ${textStrokeCSS}
+        }
+
+        ${iconAnimationsCSS}
+    </style>
+</head>
+<body>
+
+    <div class="overlay-container">
+        <div class="slide-social">
+            <div class="icon-container">
+                ${iconsHTML}
+            </div>
+            <div class="fadlila-text">${cfg.username}</div>
+        </div>
+
+        <div class="slide-tip">
+            <div class="tip-text">${cfg.tipLink}</div>
+        </div>
+    </div>
+
+    <script>
+        const durSocial = ${cfg.durSocial};
+        const durTip = ${cfg.durTip};
+        let showingTip = ${cfg.startWithTip};
+
+        const socialEl = document.querySelector('.slide-social');
+        const tipEl = document.querySelector('.slide-tip');
+
+        function switchSlide() {
+            if (showingTip) {
+                tipEl.classList.remove('active');
+                tipEl.classList.add('exit');
+                setTimeout(() => {
+                    tipEl.classList.remove('exit');
+                    socialEl.classList.add('active');
+                }, 300);
+                showingTip = false;
+                setTimeout(switchSlide, durSocial * 1000);
+            } else {
+                socialEl.classList.remove('active');
+                socialEl.classList.add('exit');
+                setTimeout(() => {
+                    socialEl.classList.remove('exit');
+                    tipEl.classList.add('active');
+                }, 300);
+                showingTip = true;
+                setTimeout(switchSlide, durTip * 1000);
+            }
+        }
+
+        if (showingTip) {
+            tipEl.classList.add('active');
+            setTimeout(switchSlide, durTip * 1000);
+        } else {
+            socialEl.classList.add('active');
+            setTimeout(switchSlide, durSocial * 1000);
+        }
+    <\/script>
+</body>
+</html>`;
+        }
+
+        // Fullscreen Modal Controls
+        function openFullPreviewModal() {
+            document.getElementById('modalFullPreview').classList.remove('hidden');
+        }
+
+        function closeFullPreviewModal() {
+            document.getElementById('modalFullPreview').classList.add('hidden');
+        }
+
+        // Restart preview animation loop
+        function restartPreviewAnimation() {
+            renderOverlay();
+        }
+
+        // Download Countdown Modal Actions (20 seconds countdown with unlocked manual button after 10s)
+        function openDownloadModal() {
+            const modal = document.getElementById('modalDownload');
+            const timerElem = document.getElementById('downloadTimer');
+            const timerUnit = document.getElementById('downloadTimerUnit');
+            const statusTitle = document.getElementById('modalStatusTitle');
+            const btnManual = document.getElementById('btnManualDownload');
+            const btnNotice = document.getElementById('btnManualNotice');
+
+            modal.classList.remove('hidden');
+
+            let timeLeft = 20;
+            downloadedState = false;
+
+            timerElem.innerText = timeLeft;
+            timerUnit.innerText = 'Detik';
+            statusTitle.innerText = 'Menyiapkan Download...';
+            
+            btnManual.disabled = true;
+            btnNotice.innerText = '(Tunggu min. 10s)';
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElem.innerText = timeLeft;
+
+                // Unlock manual download button after 10 seconds (when 10 seconds remaining)
+                if (timeLeft <= 10 && btnManual.disabled) {
+                    btnManual.disabled = false;
+                    btnNotice.innerText = '(Siap Klik)';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (!downloadedState) {
+                        triggerImmediateDownload();
+                    }
+                    statusTitle.innerText = 'File Berhasil Di-download!';
+                    timerElem.innerText = '✓';
+                    timerUnit.innerText = 'Selesai';
+                }
+            }, 1000);
+        }
+
+        function closeDownloadModal() {
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('modalDownload').classList.add('hidden');
+        }
+
+        // Trigger Direct Stream.html File Download
+        function triggerImmediateDownload() {
+            downloadedState = true;
+            const code = generateHTMLCode();
+            const blob = new Blob([code], { type: 'text/html;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'stream.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('File stream.html berhasil di-download!');
+        }
+
+        // Toast Notification Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = msg;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-10px]');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-10px]');
+            }, 3000);
+        }
+
+        // Keyboard Shortcut ESC to close modal
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeFullPreviewModal();
+                closeDownloadModal();
+            }
+        });
+
+        // Initial Render on Load
+        window.onload = function() {
+            renderOverlay();
+        };
+
+        /* ===== Popup Donasi (sukarela + setuju dulu) ===== */
+        function openDonasiModal() {
+            document.getElementById('donasiAgree').checked = false;
+            document.getElementById('btnSupportNow').disabled = true;
+            document.getElementById('btnSupportNow').style.opacity = '0.5';
+            document.getElementById('donasiModal').style.display = 'flex';
+        }
+        function closeDonasiModal() {
+            document.getElementById('donasiModal').style.display = 'none';
+        }
+        function toggleSupportBtn() {
+            const ok = document.getElementById('donasiAgree').checked;
+            const b = document.getElementById('btnSupportNow');
+            b.disabled = !ok;
+            b.style.opacity = ok ? '1' : '0.5';
+        }
+        function supportNow() {
+            if (!document.getElementById('donasiAgree').checked) return;
+            window.open('https://yapp.ink/fadlilaly/tip', '_blank');
+            closeDonasiModal();
+        }
+    </script>
+
+    <!-- ===== POPUP DONASI ===== -->
+    <div id="donasiModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(5,5,15,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+        <div style="width:100%; max-width:400px; background:rgba(26,26,46,.97); border:1px solid rgba(162,155,254,.35); border-radius:20px; padding:28px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.6);">
+            <div style="font-size:44px; margin-bottom:8px;">💛</div>
+            <h2 style="font-size:20px; font-weight:800; color:#fff; margin-bottom:6px;">Support / Donasi</h2>
+            <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.65); margin-bottom:14px;">
+                <b style="color:#fff;">Donasi 100% sukarela</b> — tanpa paksaan.<br>Semua fitur tetap <b style="color:#fff;">gratis</b>. 🙏
+            </p>
+            <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); cursor:pointer; text-align:left; margin-bottom:14px;">
+                <input type="checkbox" id="donasiAgree" onchange="toggleSupportBtn()" style="margin-top:2px; width:16px; height:16px; accent-color:#8e7cf3; cursor:pointer;">
+                <span style="font-size:12px; line-height:1.6; color:rgba(255,255,255,.75);">Saya setuju: donasi ini <b style="color:#fff;">sukarela</b> & <b style="color:#fff;">tidak dapat ditarik kembali</b>.</span>
+            </label>
+            <button id="btnSupportNow" disabled style="opacity:.5; width:100%; padding:13px; border:none; border-radius:999px; font-size:14px; font-weight:700; color:#fff; cursor:pointer; background:linear-gradient(90deg,#f59e0b,#f97316); box-shadow:0 4px 18px rgba(245,158,11,.4);" onclick="supportNow()">💛 Support Sekarang</button>
+            <button style="width:100%; margin-top:10px; padding:12px; border-radius:999px; font-size:13px; font-weight:600; color:rgba(255,255,255,.7); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); cursor:pointer;" onclick="closeDonasiModal()">Nanti Saja</button>
+        </div>
+    </div>
+</body>
+</html>

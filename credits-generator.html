@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBS Stream Credits Generator — ALI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Anton&family=Bebas+Neue&family=Caveat:wght@700&family=Cinzel:wght@700;900&family=Comfortaa:wght@700&family=Creepster&family=Fira+Code:wght@600&family=Great+Vibes&family=Inter:wght@600;900&family=Kalam:wght@700&family=Lato:wght@700;900&family=Lobster&family=Lora:ital,wght@0,700;1,700&family=Luckiest+Guy&family=Merriweather:wght@700;900&family=Montserrat:ital,wght@0,300;0,500;0,700;0,900;1,400&family=Monoton&family=Niconne&family=Open+Sans:wght@700;800&family=Oswald:wght@600;700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700;900&family=Press+Start+2P&family=Prata&family=Quicksand:wght@700&family=Rajdhani:wght@700&family=Raleway:wght@800;900&family=Righteous&family=Roboto:wght@700;900&family=Russo+One&family=Sacramento&family=Satisfy&family=Shadows+Into+Light&family=Silkscreen:wght@700&family=Space+Grotesk:wght@700&family=Special+Elite&family=Staatliches&family=Teko:wght@700&family=Titan+One&family=Ubuntu:wght@700&family=Varela+Round&family=VT323&family=Work+Sans:wght@800;900&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+  <script>
+    function goHome() {
+      const ov = document.getElementById('loadOverlay');
+      if (ov) ov.style.display = 'flex';
+      setTimeout(() => {
+        if (ov) ov.style.display = 'none';
+        try { window.parent.postMessage('ali-go-home', '*'); } catch (e) {}
+        try { window.top.postMessage('ali-go-home', '*'); } catch (e) {}
+      }, 500);
+    }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obs: {
+              bg: '#0a0a14',
+              panel: '#12121f',
+              card: '#1a1a2e',
+              accent: '#6c5ce7',
+              accentHover: '#8e7cf3',
+              border: '#2a2a45'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(162, 155, 254, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(162, 155, 254, 0.8); }
+
+    body { font-family: 'Montserrat', sans-serif; }
+    
+    /* Transparency Checkerboard Pattern for Preview */
+    .bg-checkerboard {
+      background-color: #111827;
+      background-image: 
+        linear-gradient(45deg, #1f2937 25%, transparent 25%), 
+        linear-gradient(-45deg, #1f2937 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #1f2937 75%), 
+        linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+  </style>
+</head>
+<body id="mainBody" class="bg-obs-bg text-gray-100 min-h-screen flex flex-col antialiased selection:bg-violet-500 selection:text-white">
+
+  <!-- Loading Overlay -->
+  <div id="loadOverlay" style="position:fixed; inset:0; z-index:20000; display:none; align-items:center; justify-content:center; background:rgba(10,10,20,.92);">
+    <div style="text-align:center;">
+      <div style="width:64px; height:64px; margin:0 auto 20px; border-radius:50%; border:5px solid rgba(162,155,254,.2); border-top-color:#a29bfe; animation:spinHome 1s linear infinite;"></div>
+      <div style="font-size:14px; font-weight:700; color:rgba(255,255,255,.85); letter-spacing:1px;">KEMBALI KE HALAMAN UTAMA...</div>
+      <div style="font-size:12px; color:rgba(255,255,255,.45); margin-top:6px;">Mohon tunggu sebentar ya 😊</div>
+    </div>
+  </div>
+  <style>@keyframes spinHome { to { transform:rotate(360deg); } } #loadOverlay.show { display:flex; }</style>
+
+  <!-- Top App Bar Header -->
+  <header id="topHeader" class="bg-obs-panel/95 backdrop-blur-md border-b border-obs-border px-4 sm:px-6 py-3 grid shrink-0 z-30 gap-4" style="grid-template-columns:1fr auto 1fr; align-items:center;">
+    <div class="flex items-center gap-3 justify-start">
+      <a href="#" onclick="goHome(); return false;" class="flex items-center gap-2 px-3 py-2 bg-obs-card border border-obs-border hover:border-violet-500 text-gray-200 hover:text-white font-bold text-xs rounded-lg transition-all active:scale-95 shrink-0">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Kembali ke Halaman Utama
+      </a>
+    </div>
+    <div class="hidden sm:flex items-center gap-3 flex-1 justify-center">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-purple-500 to-cyan-400 flex items-center justify-center font-black text-white text-xl shadow-lg">
+        🎬
+      </div>
+      <div class="text-center">
+        <h1 class="font-bold text-white text-sm sm:text-base leading-tight">🎬 OBS Stream <span class="text-violet-400">Credits Generator</span></h1>
+        <p class="text-[10px] text-gray-400 tracking-widest uppercase">project by ali</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 justify-end">
+      <button onclick="openDonasiModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs px-3.5 py-2 rounded-lg transition shadow-lg shadow-amber-500/25 flex items-center gap-1.5">
+        <span>💛</span> <span class="hidden sm:inline">Donasi</span>
+      </button>
+      <button id="exportHtmlBtn" onclick="openExportModal('html')" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition shadow-md flex items-center gap-1.5">
+        <span>🌐</span> <span class="hidden sm:inline">HTML</span>
+      </button>
+      <button id="recordVideoBtn" onclick="openExportModal('video')" class="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition shadow-lg flex items-center gap-2 animate-pulse">
+        <span>🎥</span> Export
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Layout Split View -->
+  <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+
+    <!-- Control Panel Sidebar -->
+    <aside id="sidebarControl" class="w-full lg:w-96 bg-obs-panel/95 backdrop-blur-md border-b lg:border-b-0 lg:border-r border-obs-border flex flex-col h-auto lg:h-full z-20 shrink-0">
+      
+      <!-- Tab Selector -->
+      <div class="flex border-b border-obs-border bg-obs-bg/60">
+        <button id="tabContentBtn" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-violet-500 transition">
+          📝 Konten
+        </button>
+        <button id="tabStyleBtn" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-200 transition">
+          🎨 Warna & BG
+        </button>
+        <button id="tabAnimBtn" class="flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-gray-200 transition">
+          ⚙️ Waktu & Render
+        </button>
+      </div>
+
+      <!-- Tab Content Scrollable Area -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
+
+        <!-- TAB 1: CONTENT EDITOR -->
+        <div id="tabContent" class="space-y-4">
+          <!-- Main Title & Subtitle -->
+          <div class="space-y-3 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Judul Utama</h3>
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Judul Kredit</label>
+              <input type="text" id="inputMainTitle" value="STREAM CREDITS" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-violet-500">
+            </div>
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Sub Judul</label>
+              <input type="text" id="inputSubtitle" value="THANK YOU FOR WATCHING" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-violet-500">
+            </div>
+          </div>
+
+          <!-- Category 1 -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Kategori 1 (Judul & Daftar Nama)</label>
+              <input type="text" id="inputCat1Title" value="TOP CHATTERS" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 mb-2" placeholder="Judul Kategori 1 (Kosongkan jika skip)">
+            </div>
+            <textarea id="inputCat1List" rows="3" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2.5 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-cyan-500" placeholder="1 nama per baris...">Moci
+Cila
+Roberto
+Bretpit
+Nasihan
+Oreo
+Batman
+Bigmo
+Lutfihalimawan
+Bangwindah</textarea>
+          </div>
+
+          <!-- Category 2 -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Kategori 2</label>
+              <input type="text" id="inputCat2Title" value="FOLLOWERS" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 mb-2" placeholder="Judul Kategori 2 (Kosongkan jika skip)">
+            </div>
+            <textarea id="inputCat2List" rows="3" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2.5 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-cyan-500" placeholder="1 nama per baris...">Ilham
+Alex
+bahasa
+kemarin
+dan lain lain</textarea>
+          </div>
+
+          <!-- Category 3 -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Kategori 3</label>
+              <input type="text" id="inputCat3Title" value="SUPER CHAT & DONATORS" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 mb-2" placeholder="Judul Kategori 3 (Kosongkan jika skip)">
+            </div>
+            <textarea id="inputCat3List" rows="3" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2.5 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-cyan-500" placeholder="1 nama per baris...">SultanStreamer
+RajaSawer
+BroSantai</textarea>
+          </div>
+
+          <!-- Category 4 -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Kategori 4</label>
+              <input type="text" id="inputCat4Title" value="MODERATORS" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 mb-2" placeholder="Judul Kategori 4 (Kosongkan jika skip)">
+            </div>
+            <textarea id="inputCat4List" rows="2" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2.5 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-cyan-500" placeholder="1 nama per baris...">ModSatpam
+ModGercep</textarea>
+          </div>
+
+          <!-- Category 5 -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <div>
+              <label class="block text-[11px] text-gray-400 mb-1">Kategori 5</label>
+              <input type="text" id="inputCat5Title" value="" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-bold focus:outline-none focus:border-cyan-500 mb-2" placeholder="Judul Kategori 5 (Kosongkan jika skip)">
+            </div>
+            <textarea id="inputCat5List" rows="2" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2.5 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-cyan-500" placeholder="1 nama per baris..."></textarea>
+          </div>
+
+          <!-- Ending Message -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Teks Penutup Akhir</label>
+            <input type="text" id="inputEnding" value="SEE YOU NEXT STREAM" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-xs text-violet-400 font-bold focus:outline-none focus:border-violet-500">
+          </div>
+        </div>
+
+        <!-- TAB 2: STYLE & THEME EDITOR -->
+        <div id="tabStyle" class="space-y-4 hidden">
+          
+          <!-- Presets Warna (12 Presets) -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Preset Tune Warna (12 Pilihan)</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button data-preset="neon" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 shrink-0"></span> Neon Cyber
+              </button>
+              <button data-preset="gold" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-yellow-400 to-amber-600 shrink-0"></span> Golden Film
+              </button>
+              <button data-preset="emerald" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 shrink-0"></span> Emerald Glow
+              </button>
+              <button data-preset="sunset" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 shrink-0"></span> Sunset Wave
+              </button>
+              <button data-preset="vaporwave" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-400 shrink-0"></span> Vaporwave 80s
+              </button>
+              <button data-preset="matrix" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-600 shrink-0"></span> Matrix Green
+              </button>
+              <button data-preset="crimson" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-red-500 to-rose-700 shrink-0"></span> Crimson Blood
+              </button>
+              <button data-preset="electric" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-blue-400 to-violet-600 shrink-0"></span> Electric Blue
+              </button>
+              <button data-preset="pastel" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-purple-300 to-pink-300 shrink-0"></span> Soft Pastel
+              </button>
+              <button data-preset="silver" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-gray-200 to-slate-400 shrink-0"></span> Silver Metal
+              </button>
+              <button data-preset="arcade" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-yellow-300 to-violet-500 shrink-0"></span> Arcade Pixel
+              </button>
+              <button data-preset="sakura" class="preset-btn bg-obs-bg hover:bg-obs-card border border-obs-border p-2 rounded-lg text-[11px] text-left flex items-center gap-2">
+                <span class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-pink-300 to-rose-400 shrink-0"></span> Sakura Blossom
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Pickers Kustom -->
+          <div class="space-y-3 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kustom Color Pickers</h3>
+            
+            <div class="flex items-center justify-between">
+              <label class="text-xs text-gray-300">Gradien Judul (Awal)</label>
+              <input type="color" id="colorTune1" value="#ff007f" class="w-7 h-7 bg-transparent rounded cursor-pointer border border-obs-border">
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-xs text-gray-300">Gradien Judul (Akhir)</label>
+              <input type="color" id="colorTune2" value="#00dfd8" class="w-7 h-7 bg-transparent rounded cursor-pointer border border-obs-border">
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-xs text-gray-300">Warna Subtitle & Judul Kategori</label>
+              <input type="color" id="colorHeader" value="#00dfd8" class="w-7 h-7 bg-transparent rounded cursor-pointer border border-obs-border">
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="text-xs text-gray-300">Warna Daftar Nama</label>
+              <input type="color" id="colorNames" value="#ffffff" class="w-7 h-7 bg-transparent rounded cursor-pointer border border-obs-border">
+            </div>
+          </div>
+
+          <!-- Background Settings & Local Media Upload -->
+          <div class="space-y-3 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pilihan Background</h3>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <button id="bgTransBtn" class="bg-violet-500/20 border-violet-500 border p-2 rounded-lg text-[11px] text-violet-300 font-semibold text-center hover:bg-violet-500/30 transition">
+                🏁 Transparan (OBS)
+              </button>
+              <button id="bgDarkBtn" class="bg-obs-bg border-obs-border border p-2 rounded-lg text-[11px] text-gray-300 font-semibold text-center hover:bg-obs-panel transition">
+                🌙 Gelap (Dark)
+              </button>
+              <button id="bgLightBtn" class="bg-white border-gray-300 border p-2 rounded-lg text-[11px] text-gray-900 font-semibold text-center hover:bg-gray-100 transition">
+                ☀️ Putih (Light)
+              </button>
+              <div class="flex items-center gap-2 bg-obs-bg border border-obs-border px-2 py-1 rounded-lg">
+                <input type="color" id="colorBgCustom" value="#090d16" class="w-5 h-5 bg-transparent rounded cursor-pointer border-0">
+                <span class="text-[10px] text-gray-400">Solid Color</span>
+              </div>
+            </div>
+
+            <!-- Upload Local File Background -->
+            <div class="pt-2 border-t border-obs-border/60">
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1.5">🖼️ File Background Lokal (Gambar / Video)</label>
+              <input type="file" id="bgLocalFileInput" accept="image/*,video/*" class="w-full text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-600 file:text-white hover:file:bg-violet-500 cursor-pointer">
+              <p class="text-[10px] text-gray-400 mt-1">Dukung PNG, JPG, WEBP, MP4, WEBM.</p>
+            </div>
+          </div>
+
+          <!-- Font Style (50+ Fonts) -->
+          <div class="space-y-2 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Gaya Font (50+ Google Fonts)</label>
+            <select id="fontSelect" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-violet-500">
+              <optgroup label="Cinematic & Epic">
+                <option value="Cinzel">Cinzel</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Lora">Lora</option>
+                <option value="Prata">Prata</option>
+                <option value="Zilla Slab">Zilla Slab</option>
+              </optgroup>
+              <optgroup label="Display & Streamer Bold">
+                <option value="Bebas Neue">Bebas Neue</option>
+                <option value="Anton">Anton</option>
+                <option value="Oswald">Oswald</option>
+                <option value="Staatliches">Staatliches</option>
+                <option value="Russo One">Russo One</option>
+                <option value="Righteous">Righteous</option>
+                <option value="Teko">Teko</option>
+                <option value="Titan One">Titan One</option>
+                <option value="Luckiest Guy">Luckiest Guy</option>
+                <option value="Monoton">Monoton</option>
+              </optgroup>
+              <optgroup label="Modern Sans-Serif">
+                <option value="Montserrat" selected>Montserrat</option>
+                <option value="Inter">Inter</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Lato">Lato</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Ubuntu">Ubuntu</option>
+                <option value="Work Sans">Work Sans</option>
+                <option value="Space Grotesk">Space Grotesk</option>
+                <option value="Comfortaa">Comfortaa</option>
+                <option value="Quicksand">Quicksand</option>
+                <option value="Varela Round">Varela Round</option>
+              </optgroup>
+              <optgroup label="Retro, Pixel & Gaming">
+                <option value="Press Start 2P">Press Start 2P (8-Bit Pixel)</option>
+                <option value="VT323">VT323 (Terminal Pixel)</option>
+                <option value="Silkscreen">Silkscreen</option>
+                <option value="Fira Code">Fira Code</option>
+                <option value="Rajdhani">Rajdhani Sci-Fi</option>
+                <option value="Special Elite">Special Elite (Typewriter)</option>
+                <option value="Creepster">Creepster (Horror)</option>
+              </optgroup>
+              <optgroup label="Handwriting & Script">
+                <option value="Lobster">Lobster</option>
+                <option value="Pacifico">Pacifico</option>
+                <option value="Great Vibes">Great Vibes</option>
+                <option value="Alex Brush">Alex Brush</option>
+                <option value="Sacramento">Sacramento</option>
+                <option value="Satisfy">Satisfy</option>
+                <option value="Niconne">Niconne</option>
+                <option value="Permanent Marker">Permanent Marker</option>
+                <option value="Caveat">Caveat</option>
+                <option value="Kalam">Kalam</option>
+                <option value="Shadows Into Light">Shadows Into Light</option>
+              </optgroup>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: ANIMATION & RENDER -->
+        <div id="tabAnim" class="space-y-4 hidden">
+          <div class="space-y-4 bg-obs-card/40 p-3.5 rounded-xl border border-obs-border/50">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Durasi & Kecepatan</h3>
+
+            <!-- Opsi Mode Putar (Looping vs 1x Tampil) -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-300">Mode Putar Animasi:</label>
+              <select id="animPlayMode" class="w-full bg-obs-bg border border-obs-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-violet-500">
+                <option value="loop" selected>🔄 Loop (Putar Terus-menerus)</option>
+                <option value="once">1️⃣ 1x Tampil Lalu Berhenti (Stop di Akhir)</option>
+              </select>
+              <p class="text-[10px] text-gray-400">Pilih "1x Tampil" jika kredit hanya ingin berjalan sekali lalu berhenti di teks penutup.</p>
+            </div>
+
+            <div class="space-y-2 pt-2">
+              <div class="flex justify-between items-center text-xs">
+                <label for="animSpeedRange" class="text-gray-300 font-medium">Durasi Total Scroll:</label>
+                <span id="animSpeedVal" class="text-violet-400 font-mono font-bold">25 Detik</span>
+              </div>
+              <input type="range" id="animSpeedRange" min="8" max="60" value="25" class="w-full accent-violet-500 cursor-pointer">
+              <p class="text-[10px] text-gray-400">Makin besar detik = animasi scroll berjalan makin pelan.</p>
+            </div>
+          </div>
+
+          <!-- Export Settings Card -->
+          <div class="bg-violet-950/40 border border-violet-800/50 p-4 rounded-xl text-xs text-violet-200 space-y-2">
+            <div class="font-bold text-violet-300 flex items-center gap-1.5">
+              <span>📹</span> Info Mode Export Video:
+            </div>
+            <p class="text-gray-300 text-[11px] leading-relaxed">
+              Saat menekan tombol <strong>"Export Video (WEBM)"</strong>, sistem akan secara otomatis merekam animasi kredit dari awal hingga posisi penutup paling akhir lalu mengunduhnya langsung sebagai file `.webm` berkualitas tinggi 1080p.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- Main Canvas Live Preview Screen -->
+    <main class="flex-1 relative bg-obs-bg flex flex-col justify-center items-center p-3 sm:p-6 overflow-hidden">
+      
+      <!-- Video / Canvas Preview Container -->
+      <div id="previewCard" class="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl border border-obs-border flex items-center justify-center bg-checkerboard">
+        
+        <!-- HTML5 Canvas Engine -->
+        <canvas id="creditsCanvas" width="1920" height="1080" class="w-full h-full object-contain"></canvas>
+
+        <!-- Status Overlay Toast (Render/Export Status) -->
+        <div id="recordingToast" class="absolute top-4 right-4 bg-red-600/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl flex items-center gap-2 hidden animate-pulse">
+          <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+          <span id="recordingToastText">Merekam Video (0%)...</span>
+        </div>
+      </div>
+
+      <!-- Playback Bar Below Canvas -->
+      <div class="w-full max-w-4xl mt-3 bg-obs-panel/80 backdrop-blur-md border border-obs-border rounded-xl px-4 py-2 flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <button id="playBtn" class="bg-violet-600 hover:bg-violet-500 text-white font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+            <span id="playIcon">⏸️</span> <span id="playText">Pause</span>
+          </button>
+          <button id="restartBtn" class="bg-obs-card hover:bg-obs-accentHover text-gray-200 px-3 py-1.5 rounded-lg border border-obs-border transition">
+            🔄 Reset
+          </button>
+        </div>
+
+        <!-- Timeline Progress Indicator -->
+        <div class="flex-1 flex items-center gap-3">
+          <span id="timeCurrent" class="font-mono text-gray-400 text-[11px]">00:00</span>
+          <div class="flex-1 bg-obs-card h-1.5 rounded-full overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-violet-500 to-cyan-400 h-full w-0 transition-all duration-75"></div>
+          </div>
+          <span id="timeTotal" class="font-mono text-gray-400 text-[11px]">00:25</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // --- CANVAS ENGINE & STATE ---
+    const canvas = document.getElementById('creditsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Controls DOM
+    const playBtn = document.getElementById('playBtn');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const restartBtn = document.getElementById('restartBtn');
+    const progressBar = document.getElementById('progressBar');
+    const timeCurrent = document.getElementById('timeCurrent');
+    const timeTotal = document.getElementById('timeTotal');
+    const animSpeedRange = document.getElementById('animSpeedRange');
+    const animSpeedVal = document.getElementById('animSpeedVal');
+    const animPlayMode = document.getElementById('animPlayMode');
+    const recordingToast = document.getElementById('recordingToast');
+    const recordingToastText = document.getElementById('recordingToastText');
+
+    // Form Inputs
+    const inputMainTitle = document.getElementById('inputMainTitle');
+    const inputSubtitle = document.getElementById('inputSubtitle');
+    
+    // Categories 1-5 Inputs
+    const catInputs = [
+      { title: document.getElementById('inputCat1Title'), list: document.getElementById('inputCat1List') },
+      { title: document.getElementById('inputCat2Title'), list: document.getElementById('inputCat2List') },
+      { title: document.getElementById('inputCat3Title'), list: document.getElementById('inputCat3List') },
+      { title: document.getElementById('inputCat4Title'), list: document.getElementById('inputCat4List') },
+      { title: document.getElementById('inputCat5Title'), list: document.getElementById('inputCat5List') }
+    ];
+
+    const inputEnding = document.getElementById('inputEnding');
+
+    // Style & Color Inputs
+    const colorTune1 = document.getElementById('colorTune1');
+    const colorTune2 = document.getElementById('colorTune2');
+    const colorHeader = document.getElementById('colorHeader');
+    const colorNames = document.getElementById('colorNames');
+    const colorBgCustom = document.getElementById('colorBgCustom');
+    const fontSelect = document.getElementById('fontSelect');
+    const bgLocalFileInput = document.getElementById('bgLocalFileInput');
+
+    // Tabs DOM
+    const tabContentBtn = document.getElementById('tabContentBtn');
+    const tabStyleBtn = document.getElementById('tabStyleBtn');
+    const tabAnimBtn = document.getElementById('tabAnimBtn');
+    const tabContent = document.getElementById('tabContent');
+    const tabStyle = document.getElementById('tabStyle');
+    const tabAnim = document.getElementById('tabAnim');
+
+    // State Variables
+    let isPlaying = true;
+    let durationSec = 25;
+    let startTime = null;
+    let elapsedTime = 0;
+    let animationFrameId = null;
+    let totalCreditsHeight = 0;
+    let bgMode = 'transparent'; // 'transparent', 'dark', 'light', 'custom', 'local'
+    let localBgImage = null;
+    let localBgVideo = null;
+
+    // Handle Local File Upload (Image / Video)
+    bgLocalFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.type.startsWith('image/')) {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          localBgImage = img;
+          if (localBgVideo) { localBgVideo.pause(); localBgVideo = null; }
+          bgMode = 'local';
+        };
+      } else if (file.type.startsWith('video/')) {
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(file);
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.play();
+        localBgVideo = video;
+        localBgImage = null;
+        bgMode = 'local';
+      }
+    });
+
+    // --- 1. RENDER CANVAS ENGINE WITH DYNAMIC SPACING ---
+    function renderFrame(timestamp) {
+      if (!startTime) startTime = timestamp - elapsedTime;
+      if (isPlaying) {
+        elapsedTime = timestamp - startTime;
+      }
+
+      let progress = elapsedTime / (durationSec * 1000);
+      const playMode = animPlayMode.value;
+
+      if (playMode === 'once') {
+        if (progress >= 1) {
+          progress = 1; // Stop di akhir
+          isPlaying = false;
+          playIcon.textContent = '▶️';
+          playText.textContent = 'Play';
+        }
+      } else {
+        progress = Math.min(progress, 1);
+      }
+      
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Render Selected Background
+      if (bgMode === 'dark') {
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else if (bgMode === 'light') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else if (bgMode === 'custom') {
+        ctx.fillStyle = colorBgCustom.value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else if (bgMode === 'local') {
+        if (localBgImage) {
+          ctx.drawImage(localBgImage, 0, 0, canvas.width, canvas.height);
+        } else if (localBgVideo && localBgVideo.readyState >= 2) {
+          ctx.drawImage(localBgVideo, 0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      // Calculate Y Position Scroll
+      const startY = canvas.height;
+      const endY = -totalCreditsHeight - 100;
+      const currentY = startY + progress * (endY - startY);
+
+      // Draw Credits Content
+      let y = currentY;
+      const font = fontSelect.value;
+
+      // Header Decorative Bar
+      const gradient = ctx.createLinearGradient(canvas.width / 2 - 80, 0, canvas.width / 2 + 80, 0);
+      gradient.addColorStop(0, colorTune1.value);
+      gradient.addColorStop(1, colorTune2.value);
+
+      y += 20;
+
+      // Main Title
+      ctx.textAlign = 'center';
+      ctx.font = `900 68px "${font}", sans-serif`;
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = colorTune1.value;
+      ctx.shadowBlur = 15;
+      ctx.fillText(inputMainTitle.value.toUpperCase(), canvas.width / 2, y);
+      ctx.shadowBlur = 0;
+      y += 50;
+
+      // Subtitle
+      if (inputSubtitle.value.trim()) {
+        ctx.font = `700 28px "${font}", sans-serif`;
+        ctx.fillStyle = colorHeader.value;
+        ctx.fillText(inputSubtitle.value.toUpperCase(), canvas.width / 2, y);
+        y += 70;
+      }
+
+      // DYNAMIC SPACING: Render Only Non-Empty Categories
+      catInputs.forEach((cat, index) => {
+        const titleText = cat.title.value.trim();
+        const names = cat.list.value.split('\n').filter(n => n.trim() !== '');
+
+        // SKIP category if both title and names are empty
+        if (!titleText && names.length === 0) return;
+
+        y += 20;
+
+        // Render Category Title
+        if (titleText) {
+          ctx.font = `800 30px "${font}", sans-serif`;
+          ctx.fillStyle = colorHeader.value;
+          ctx.fillText(titleText.toUpperCase(), canvas.width / 2, y);
+          y += 28;
+
+          // Underline Ornament
+          ctx.strokeStyle = colorHeader.value;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(canvas.width / 2 - 80, y);
+          ctx.lineTo(canvas.width / 2 + 80, y);
+          ctx.stroke();
+          y += 35;
+        }
+
+        // Render Names List
+        if (names.length > 0) {
+          ctx.font = `600 24px "${font}", sans-serif`;
+          ctx.fillStyle = colorNames.value;
+          names.forEach(name => {
+            ctx.fillText(name, canvas.width / 2, y);
+            y += 38;
+          });
+        }
+
+        // Section Divider Ornament
+        y += 30;
+        ctx.fillStyle = colorHeader.value;
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2 - 25, y, 4, 0, Math.PI * 2);
+        ctx.arc(canvas.width / 2, y, 5, 0, Math.PI * 2);
+        ctx.arc(canvas.width / 2 + 25, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        y += 40;
+      });
+
+      // Ending Message
+      if (inputEnding.value.trim()) {
+        y += 40;
+        ctx.font = `900 56px "${font}", sans-serif`;
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = colorTune2.value;
+        ctx.shadowBlur = 20;
+        ctx.fillText(inputEnding.value.toUpperCase(), canvas.width / 2, y);
+        ctx.shadowBlur = 0;
+        y += 45;
+
+        ctx.font = `500 16px font-mono, sans-serif`;
+        ctx.fillStyle = '#6b7280';
+        ctx.fillText("© ALL RIGHTS RESERVED", canvas.width / 2, y);
+      }
+      
+      totalCreditsHeight = y - currentY;
+
+      // Update UI Progress Bar & Timer
+      progressBar.style.width = `${progress * 100}%`;
+      const curSec = Math.floor(progress * durationSec);
+      timeCurrent.textContent = formatTime(curSec);
+
+      // Loop / Reset on Completion if Loop Mode Active
+      if (progress >= 1 && playMode === 'loop') {
+        startTime = timestamp;
+      }
+
+      if (isPlaying) {
+        animationFrameId = requestAnimationFrame(renderFrame);
+      }
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // --- 2. CONTROLS & EVENT LISTENERS ---
+    playBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        playIcon.textContent = '⏸️';
+        playText.textContent = 'Pause';
+        startTime = performance.now() - elapsedTime;
+        animationFrameId = requestAnimationFrame(renderFrame);
+      } else {
+        playIcon.textContent = '▶️';
+        playText.textContent = 'Play';
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      elapsedTime = 0;
+      startTime = performance.now();
+      if (!isPlaying) {
+        isPlaying = true;
+        playIcon.textContent = '⏸️';
+        playText.textContent = 'Pause';
+        animationFrameId = requestAnimationFrame(renderFrame);
+      }
+    });
+
+    animSpeedRange.addEventListener('input', (e) => {
+      durationSec = parseInt(e.target.value);
+      animSpeedVal.textContent = `${durationSec} Detik`;
+      timeTotal.textContent = formatTime(durationSec);
+    });
+
+    // Background Selection
+    document.getElementById('bgTransBtn').addEventListener('click', () => bgMode = 'transparent');
+    document.getElementById('bgDarkBtn').addEventListener('click', () => bgMode = 'dark');
+    document.getElementById('bgLightBtn').addEventListener('click', () => bgMode = 'light');
+    colorBgCustom.addEventListener('input', () => bgMode = 'custom');
+
+    // Color Presets (12 Options)
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.getAttribute('data-preset');
+        if (type === 'neon') {
+          colorTune1.value = '#ff007f'; colorTune2.value = '#00dfd8'; colorHeader.value = '#00dfd8'; colorNames.value = '#ffffff';
+        } else if (type === 'gold') {
+          colorTune1.value = '#fbbf24'; colorTune2.value = '#d97706'; colorHeader.value = '#f59e0b'; colorNames.value = '#fef3c7';
+        } else if (type === 'emerald') {
+          colorTune1.value = '#34d399'; colorTune2.value = '#059669'; colorHeader.value = '#10b981'; colorNames.value = '#ecfdf5';
+        } else if (type === 'sunset') {
+          colorTune1.value = '#f97316'; colorTune2.value = '#f43f5e'; colorHeader.value = '#fb923c'; colorNames.value = '#fff7ed';
+        } else if (type === 'vaporwave') {
+          colorTune1.value = '#a855f7'; colorTune2.value = '#f472b6'; colorHeader.value = '#c084fc'; colorNames.value = '#fae8ff';
+        } else if (type === 'matrix') {
+          colorTune1.value = '#4ade80'; colorTune2.value = '#059669'; colorHeader.value = '#22c55e'; colorNames.value = '#f0fdf4';
+        } else if (type === 'crimson') {
+          colorTune1.value = '#ef4444'; colorTune2.value = '#9f1239'; colorHeader.value = '#f87171'; colorNames.value = '#fef2f2';
+        } else if (type === 'electric') {
+          colorTune1.value = '#38bdf8'; colorTune2.value = '#4f46e5'; colorHeader.value = '#60a5fa'; colorNames.value = '#eff6ff';
+        } else if (type === 'pastel') {
+          colorTune1.value = '#d8b4fe'; colorTune2.value = '#f472b6'; colorHeader.value = '#fbcfe8'; colorNames.value = '#ffffff';
+        } else if (type === 'silver') {
+          colorTune1.value = '#f3f4f6'; colorTune2.value = '#9ca3af'; colorHeader.value = '#e5e7eb'; colorNames.value = '#f9fafb';
+        } else if (type === 'arcade') {
+          colorTune1.value = '#fde047'; colorTune2.value = '#ec4899'; colorHeader.value = '#facc15'; colorNames.value = '#ffffff';
+        } else if (type === 'sakura') {
+          colorTune1.value = '#f472b6'; colorTune2.value = '#fb7185'; colorHeader.value = '#f472b6'; colorNames.value = '#fff1f2';
+        }
+      });
+    });
+
+    // Tabs Navigation
+    function setTab(btn, tab) {
+      [tabContentBtn, tabStyleBtn, tabAnimBtn].forEach(b => {
+        b.classList.remove('text-violet-400', 'border-b-2', 'border-violet-500');
+        b.classList.add('text-gray-400');
+      });
+      [tabContent, tabStyle, tabAnim].forEach(t => t.classList.add('hidden'));
+
+      btn.classList.remove('text-gray-400');
+      btn.classList.add('text-violet-400', 'border-b-2', 'border-violet-500');
+      tab.classList.remove('hidden');
+    }
+    tabContentBtn.addEventListener('click', () => setTab(tabContentBtn, tabContent));
+    tabStyleBtn.addEventListener('click', () => setTab(tabStyleBtn, tabStyle));
+    tabAnimBtn.addEventListener('click', () => setTab(tabAnimBtn, tabAnim));
+
+    // --- 3. EXPORT VIDEO (MEDIA RECORDER API) ---
+    async function doExportVideo() {
+      recordingToast.classList.remove('hidden');
+      recordingToastText.textContent = 'Menyiapkan Perekaman Video...';
+
+      // Reset animation to 0
+      elapsedTime = 0;
+      startTime = performance.now();
+      isPlaying = true;
+
+      const stream = canvas.captureStream(60); // 60 FPS
+      const recordedChunks = [];
+      
+      let options = { mimeType: 'video/webm;codecs=vp9' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm' };
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'stream_credits.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        recordingToast.classList.add('hidden');
+      };
+
+      mediaRecorder.start();
+
+      const totalMs = durationSec * 1000;
+      const interval = setInterval(() => {
+        const pct = Math.floor((elapsedTime / totalMs) * 100);
+        recordingToastText.textContent = `Merekam Video (${pct}%)...`;
+
+        if (elapsedTime >= totalMs) {
+          clearInterval(interval);
+          mediaRecorder.stop();
+        }
+      }, 100);
+    }
+
+    // --- 4. EXPORT STANDALONE OBS HTML FILE ---
+    function doExportHtml() {
+      let catHtml = '';
+      catInputs.forEach(cat => {
+        const titleText = cat.title.value.trim();
+        const names = cat.list.value.split('\n').filter(n=>n.trim());
+        if (!titleText && names.length === 0) return;
+
+        if (titleText) catHtml += `<div class="section-title">${titleText}</div>`;
+        if (names.length > 0) catHtml += `<ul>${names.map(n=>`<li>${n}</li>`).join('')}</ul>`;
+      });
+
+      const playMode = animPlayMode.value;
+      const animationIteration = playMode === 'once' ? '1 forwards' : 'infinite';
+
+      const htmlTemplate = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>OBS Stream Credits</title>
+  <link href="https://fonts.googleapis.com/css2?family=${fontSelect.value.replace(/ /g, '+')}&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; padding:0; background:${bgMode === 'dark' ? '#090d16' : bgMode === 'light' ? '#ffffff' : bgMode === 'custom' ? colorBgCustom.value : 'transparent'}; overflow:hidden; font-family:'${fontSelect.value}',sans-serif; color:${colorNames.value}; text-align:center; }
+    .wrapper { position:absolute; width:100%; top:100%; animation: scroll ${durationSec}s linear ${animationIteration}; }
+    @keyframes scroll { 0% { top:100%; transform:translateY(0); } 100% { top:0; transform:translateY(-100%); } }
+    .main-title { font-size:4rem; font-weight:900; background:linear-gradient(135deg, ${colorTune1.value}, ${colorTune2.value}); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:0; text-transform:uppercase; }
+    .subtitle { font-size:1.8rem; font-weight:700; color:${colorHeader.value}; text-transform:uppercase; margin-top:10px; }
+    .section-title { font-size:1.5rem; font-weight:800; color:${colorHeader.value}; border-bottom:2px solid ${colorHeader.value}; display:inline-block; margin:40px 0 15px 0; text-transform:uppercase; }
+    ul { list-style:none; padding:0; margin:0; }
+    li { font-size:1.3rem; margin:8px 0; font-weight:600; }
+    .ending { font-size:3.5rem; font-weight:900; background:linear-gradient(135deg, ${colorTune1.value}, ${colorTune2.value}); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-top:80px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1 class="main-title">${inputMainTitle.value}</h1>
+    <div class="subtitle">${inputSubtitle.value}</div>
+    ${catHtml}
+    <div class="ending">${inputEnding.value}</div>
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([htmlTemplate], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'obs_credits_overlay.html';
+      a.click();
+    }
+
+    // Initial Engine Kickoff
+    requestAnimationFrame(renderFrame);
+
+    /* ===== Popup Donasi (sukarela + setuju dulu) ===== */
+    function openDonasiModal() {
+      document.getElementById('donasiAgree').checked = false;
+      document.getElementById('btnSupportNow').disabled = true;
+      document.getElementById('btnSupportNow').style.opacity = '0.5';
+      document.getElementById('donasiModal').style.display = 'flex';
+    }
+    function closeDonasiModal() {
+      document.getElementById('donasiModal').style.display = 'none';
+    }
+    function toggleSupportBtn() {
+      const ok = document.getElementById('donasiAgree').checked;
+      const b = document.getElementById('btnSupportNow');
+      b.disabled = !ok;
+      b.style.opacity = ok ? '1' : '0.5';
+    }
+    function supportNow() {
+      if (!document.getElementById('donasiAgree').checked) return;
+      window.open('https://yapp.ink/fadlilaly/tip', '_blank');
+      closeDonasiModal();
+    }
+
+    /* ===== Popup Export (countdown 10 detik) ===== */
+    let exportTimer = null;
+    let exportMode = 'html';
+    function openExportModal(mode) {
+      exportMode = mode;
+      document.getElementById('exportFileName').textContent = mode === 'html' ? 'obs_credits_overlay.html' : 'credits_video.webm';
+      document.getElementById('exportSteps').innerHTML = mode === 'html'
+        ? '1. Buka OBS Studio, tambahkan Source baru <b style="color:#fff;">Browser</b>.<br>2. Centang <b style="color:#fff;">Local File</b> lalu pilih file <b style="color:#fff;">obs_credits_overlay.html</b>.<br>3. Atur Width: <b style="color:#fff;">1920</b> & Height: <b style="color:#fff;">1080</b> lalu klik OK.'
+        : '1. Klik <b style="color:#fff;">Download Sekarang</b> — video akan direkam otomatis dari awal sampai akhir kredit.<br>2. File <b style="color:#fff;">.webm</b> 1080p langsung terunduh.<br>3. Tambahkan sebagai <b style="color:#fff;">Media Source</b> di OBS.';
+      const btn = document.getElementById('btnExportNow');
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+      btn.textContent = 'Download Sekarang (Tunggu min. 10s)';
+      let s = 10;
+      document.getElementById('exportCountdown').textContent = s;
+      document.getElementById('exportModal').style.display = 'flex';
+      clearInterval(exportTimer);
+      exportTimer = setInterval(() => {
+        s--;
+        document.getElementById('exportCountdown').textContent = Math.max(s, 0);
+        if (s <= 0) {
+          clearInterval(exportTimer);
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+          btn.style.background = 'linear-gradient(90deg,#8e7cf3,#6c5ce7)';
+          btn.style.boxShadow = '0 4px 18px rgba(108,92,231,.5)';
+          btn.style.color = '#fff';
+          btn.textContent = '⬇️ Download Sekarang';
+        }
+      }, 1000);
+    }
+    function closeExportModal() {
+      clearInterval(exportTimer);
+      document.getElementById('exportModal').style.display = 'none';
+    }
+    function doExportNow() {
+      if (document.getElementById('btnExportNow').disabled) return;
+      closeExportModal();
+      if (exportMode === 'html') { doExportHtml(); }
+      else { doExportVideo(); }
+    }
+  </script>
+
+  <!-- ===== POPUP DONASI (GAYA INDEX) ===== -->
+  <div id="donasiModal" style="display:none; position:fixed; inset:0; z-index:110; background:rgba(5,5,15,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:400px; background:#171626; border:1px solid rgba(162,155,254,.35); border-radius:24px; padding:32px 28px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.65);">
+      <div style="font-size:52px; margin-bottom:12px;">💛</div>
+      <h2 style="font-size:21px; font-weight:800; color:#fff; margin-bottom:12px;">Support / Donasi</h2>
+      <p style="font-size:13px; line-height:1.7; color:rgba(255,255,255,.75); margin-bottom:18px;">
+        <b style="color:#fff;">Donasi 100% sukarela</b> — tanpa paksaan.<br>
+        Semua fitur tetap <b style="color:#fff;">gratis</b>. 🙏
+      </p>
+      <label style="display:flex; align-items:flex-start; gap:10px; padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12); cursor:pointer; text-align:left; margin-bottom:18px;">
+        <input type="checkbox" id="donasiAgree" onchange="toggleSupportBtn()" style="margin-top:3px; width:16px; height:16px; accent-color:#8e7cf3; cursor:pointer;">
+        <span style="font-size:12.5px; line-height:1.6; color:rgba(255,255,255,.8);">Saya setuju: donasi ini <b style="color:#fff;">sukarela</b> & <b style="color:#fff;">tidak dapat ditarik kembali</b>.</span>
+      </label>
+      <button id="btnSupportNow" disabled style="opacity:.5; width:100%; padding:14px; border:none; border-radius:999px; font-size:14.5px; font-weight:700; color:rgba(255,255,255,.7); cursor:not-allowed; background:linear-gradient(90deg,#b45309,#c2410c); box-shadow:0 4px 18px rgba(245,158,11,.35);" onclick="supportNow()">💛 Support Sekarang</button>
+      <button style="width:100%; margin-top:12px; padding:13px; border-radius:999px; font-size:14px; font-weight:700; color:rgba(255,255,255,.75); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); cursor:pointer;" onclick="closeDonasiModal()">Nanti Saja</button>
+    </div>
+  </div>
+
+  <!-- ===== POPUP EXPORT (COUNTDOWN, GAYA OVERLAY GENERATOR) ===== -->
+  <div id="exportModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(5,5,15,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:420px; background:#141420; border:1px solid rgba(162,155,254,.4); border-radius:24px; padding:28px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.7); position:relative;">
+      <button onclick="closeExportModal()" style="position:absolute; top:16px; right:16px; background:rgba(255,255,255,.1); border:none; color:#fff; width:32px; height:32px; border-radius:10px; cursor:pointer; font-size:14px;">✕</button>
+      <div style="width:64px; height:64px; margin:4px auto 16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; background:rgba(139,92,246,.18); border:1px solid rgba(139,92,246,.5);">⬇️</div>
+      <h2 style="font-size:22px; font-weight:800; color:#fff; margin-bottom:8px;">Menyiapkan Download...</h2>
+      <p style="font-size:12px; color:rgba(255,255,255,.6); margin-bottom:14px;">File <span id="exportFileName" style="background:rgba(0,0,0,.5); padding:2px 10px; border-radius:6px; color:#a78bfa; font-family:monospace; font-weight:700;">stream.html</span> akan terunduh otomatis dalam:</p>
+      <div style="padding:16px; border-radius:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); margin-bottom:16px;">
+        <span id="exportCountdown" style="font-size:34px; font-weight:900; color:#a78bfa; font-variant-numeric:tabular-nums;">19</span>
+        <span style="font-size:13px; color:rgba(255,255,255,.6);"> Detik</span>
+      </div>
+      <div style="padding:14px 16px; border-radius:14px; background:linear-gradient(135deg, rgba(139,92,246,.12), rgba(16,185,129,.08)); border:1px solid rgba(139,92,246,.3); text-align:left; margin-bottom:16px;">
+        <p style="font-size:12px; line-height:1.7; color:rgba(255,255,255,.75); margin:0 0 12px 0;">
+          Overlay ini <b style="color:#fff;">100% gratis</b> buat kamu pakai! Tapi kalau merasa terbantu dan mau apresiasi/support, bisa kirim saweran seiklasnya ya (tanpa ada paksaan sama sekali) 🙏
+        </p>
+        <button onclick="window.open('https://yapp.ink/fadlilaly/tip', '_blank')" style="width:100%; padding:12px; border:none; border-radius:999px; font-size:13.5px; font-weight:700; color:#fff; cursor:pointer; background:linear-gradient(90deg,#059669,#10b981); box-shadow:0 4px 16px rgba(16,185,129,.35); display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span style="display:inline-flex; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,.25); align-items:center; justify-content:center; font-size:11px;">$</span> Support via Yapp Ink
+        </button>
+      </div>
+      <div style="padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); text-align:left; margin-bottom:16px;">
+        <div style="font-size:11px; font-weight:800; letter-spacing:1px; color:#a29bfe; margin-bottom:8px;">ⓘ CARA SINGKAT PASANG DI OBS:</div>
+        <div id="exportSteps" style="font-size:11.5px; line-height:1.9; color:rgba(255,255,255,.7);">
+          1. Buka OBS Studio, tambahkan Source baru <b style="color:#fff;">Browser</b>.<br>
+          2. Centang <b style="color:#fff;">Local File</b> lalu pilih file <b style="color:#fff;">stream.html</b>.<br>
+          3. Atur Width: <b style="color:#fff;">1920</b> & Height: <b style="color:#fff;">1080</b> lalu klik OK.
+        </div>
+      </div>
+      <button id="btnExportNow" disabled style="opacity:.5; width:100%; padding:13px; border:none; border-radius:999px; font-size:14px; font-weight:700; color:rgba(255,255,255,.55); cursor:not-allowed; background:rgba(255,255,255,.08);" onclick="doExportNow()">Download Sekarang (Tunggu min. 10s)</button>
+      <button style="width:100%; margin-top:8px; padding:10px; border:none; background:none; color:rgba(255,255,255,.55); font-size:13px; cursor:pointer;" onclick="closeExportModal()">Tutup / Exit</button>
+    </div>
+  </div>
+</body>
+</html>

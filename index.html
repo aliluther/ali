@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALI</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --accent: #6c5ce7;
+    --accent2: #00d2ff;
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color:#fff;
+    min-height:100vh;
+    background:#0a0a14;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* ===== background canggih ===== */
+  .bg {
+    position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(ellipse 80% 55% at 20% -10%, rgba(108,92,231,.35), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 85% 10%, rgba(0,210,255,.22), transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 110%, rgba(255,0,150,.14), transparent 60%),
+      linear-gradient(180deg,#0a0a14 0%, #101024 50%, #0a0a14 100%);
+  }
+  .bg::after {
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
+  }
+  .glow {
+    position:fixed; z-index:-1; border-radius:50%; filter:blur(110px); opacity:.5;
+    animation:float 14s ease-in-out infinite alternate;
+  }
+  .glow.g1 { width:420px; height:420px; background:#6c5ce7; top:-120px; left:-100px; }
+  .glow.g2 { width:380px; height:380px; background:#00d2ff; top:10%; right:-120px; animation-delay:-6s; }
+  .glow.g3 { width:300px; height:300px; background:#e84393; bottom:-100px; left:35%; animation-delay:-3s; }
+  @keyframes float {
+    from { transform:translateY(0) scale(1); }
+    to   { transform:translateY(60px) scale(1.15); }
+  }
+
+  /* ===== header ===== */
+  header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 36px;
+    background:rgba(255,255,255,.04);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(14px);
+    flex-wrap:wrap; gap:10px;
+  }
+  .clockbox { flex:1; min-width:220px; }
+  .clockbox .jam {
+    font-size:24px; font-weight:700; letter-spacing:1px;
+    font-variant-numeric:tabular-nums;
+    background:linear-gradient(90deg,#a29bfe,#00d2ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .clockbox .tgl {
+    font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color:rgba(255,255,255,.55); margin-top:2px;
+  }
+  .brand {
+    font-size:38px; font-weight:900; letter-spacing:6px; text-align:center;
+    background:linear-gradient(90deg,#fff,#a29bfe 60%,#00d2ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 40px rgba(108,92,231,.4);
+  }
+  .auth { flex:1; text-align:right; }
+  .btn {
+    display:inline-block; padding:10px 22px; border-radius:999px;
+    font-size:13px; font-weight:700; letter-spacing:1px; text-decoration:none;
+    margin-left:8px; transition:.2s; cursor:pointer; border:none;
+  }
+  .btn.ghost { color:#fff; border:1px solid rgba(255,255,255,.3); }
+  .btn.ghost:hover { border-color:#fff; background:rgba(255,255,255,.08); }
+  .btn.solid {
+    background:linear-gradient(90deg,var(--accent),#8e7cf3);
+    box-shadow:0 4px 18px rgba(108,92,231,.45);
+  }
+  .btn.solid:hover { transform:translateY(-2px); box-shadow:0 8px 26px rgba(108,92,231,.6); }
+  .btn.shopee {
+    background:linear-gradient(90deg,#ee4d2d,#ff7337);
+    box-shadow:0 4px 14px rgba(238,77,45,.4); color:#fff;
+  }
+  .btn.shopee:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(238,77,45,.55); }
+  .btn.small { padding:7px 14px; font-size:11px; margin:0; }
+
+  .aboutbar { text-align:center; padding:12px 0; }
+  .aboutbar a {
+    color:rgba(255,255,255,.65); font-size:12px; font-weight:600; cursor:pointer;
+    letter-spacing:3px; text-decoration:none; text-transform:uppercase;
+    border-bottom:1px solid transparent; padding-bottom:2px; transition:.2s;
+  }
+  .aboutbar a:hover { color:#fff; border-color:#a29bfe; }
+
+  /* ===== grid kartu ===== */
+  main { max-width:1080px; margin:0 auto; padding:44px 24px 80px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
+  .card {
+    position:relative; min-height:190px;
+    border-radius:20px; padding:28px 22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:12px; cursor:pointer;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    backdrop-filter:blur(14px);
+    overflow:hidden;
+    transition:transform .25s, box-shadow .25s, border-color .25s;
+  }
+  .card::before {
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(255,255,255,.1), transparent 45%);
+    opacity:.6; pointer-events:none;
+  }
+  .card::after {
+    content:""; position:absolute; top:0; left:20%; right:20%; height:2px;
+    background:linear-gradient(90deg,transparent,var(--c,#6c5ce7),transparent);
+  }
+  .card:hover {
+    transform:translateY(-6px);
+    border-color:rgba(255,255,255,.28);
+    box-shadow:0 18px 45px rgba(0,0,0,.5), 0 0 40px var(--glow, rgba(108,92,231,.25));
+  }
+  .icon {
+    width:58px; height:58px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+    background:linear-gradient(135deg, var(--c,#6c5ce7), transparent 140%);
+    box-shadow:0 8px 22px var(--glow, rgba(108,92,231,.35));
+  }
+  .card h3 { font-size:17px; font-weight:700; letter-spacing:.4px; line-height:1.35; }
+  .card p { font-size:12.5px; color:rgba(255,255,255,.55); line-height:1.5; max-width:250px; }
+  .badge {
+    font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    padding:5px 12px; border-radius:999px;
+    color:var(--c,#a29bfe);
+    border:1px solid var(--c,#a29bfe);
+    background:rgba(255,255,255,.03);
+  }
+  .badge.live { color:#00e6a8; border-color:#00e6a8; box-shadow:0 0 12px rgba(0,230,168,.25); }
+
+  /* ===== modal ===== */
+  .overlay {
+    position:fixed; inset:0; z-index:50;
+    background:rgba(5,5,15,.7); backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .overlay.show { display:flex; }
+  .modal {
+    width:100%; max-width:440px; max-height:88vh; overflow-y:auto;
+    background:rgba(20,20,40,.92);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:20px; padding:28px;
+    backdrop-filter:blur(20px);
+    box-shadow:0 30px 80px rgba(0,0,0,.6);
+    animation:pop .25s ease;
+  }
+  .modal.wide { max-width:640px; }
+  @keyframes pop { from{transform:scale(.92); opacity:0;} to{transform:scale(1); opacity:1;} }
+  .modal h2 {
+    font-size:22px; font-weight:800; letter-spacing:.5px; margin-bottom:4px;
+    background:linear-gradient(90deg,#fff,#a29bfe);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .modal .sub { font-size:12.5px; color:rgba(255,255,255,.5); margin-bottom:20px; }
+  .field { margin-bottom:14px; }
+  .field label {
+    display:block; font-size:11px; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:rgba(255,255,255,.6); margin-bottom:6px;
+  }
+  .field input {
+    width:100%; padding:12px 14px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.05); color:#fff; font-size:14px;
+    outline:none; transition:.2s;
+  }
+  .field input:focus { border-color:#a29bfe; box-shadow:0 0 0 3px rgba(162,155,254,.15); }
+  .modal .btn-full {
+    width:100%; text-align:center; border:none; cursor:pointer;
+    padding:13px; font-size:14px; margin-top:6px;
+  }
+  .modal .foot { text-align:center; font-size:12.5px; color:rgba(255,255,255,.55); margin-top:16px; }
+  .modal .foot a { color:#a29bfe; font-weight:700; text-decoration:none; cursor:pointer; }
+  .modal .foot a:hover { text-decoration:underline; }
+  .closex {
+    float:right; background:none; border:none; color:rgba(255,255,255,.5);
+    font-size:20px; cursor:pointer; line-height:1;
+  }
+  .closex:hover { color:#fff; }
+
+  /* ===== CUSTOM ALERT: JUAL USAHA MU DISINI ===== */
+  .custom-alert-card {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    background: linear-gradient(160deg, rgba(28, 18, 42, 0.96), rgba(16, 16, 36, 0.98));
+    border: 1px solid rgba(232, 67, 147, 0.45);
+    border-radius: 24px;
+    padding: 32px 26px 26px;
+    text-align: center;
+    backdrop-filter: blur(22px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(232, 67, 147, 0.22);
+    animation: pop .28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .custom-alert-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 22%; right: 22%; height: 2px;
+    background: linear-gradient(90deg, transparent, #e84393, #fd79a8, transparent);
+  }
+  .ca-icon-wrap {
+    width: 68px; height: 68px;
+    margin: 0 auto 14px;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    background: linear-gradient(135deg, rgba(232, 67, 147, 0.28), rgba(108, 92, 231, 0.15));
+    border: 1px solid rgba(232, 67, 147, 0.4);
+    box-shadow: 0 10px 25px rgba(232, 67, 147, 0.25);
+  }
+  .ca-pill {
+    display: inline-block;
+    font-size: 10px; font-weight: 800; letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px;
+    color: #ff76b8;
+    background: rgba(232, 67, 147, 0.14);
+    border: 1px solid rgba(232, 67, 147, 0.4);
+    margin-bottom: 12px;
+  }
+  .ca-title {
+    font-size: 21px; font-weight: 800; color: #fff;
+    margin-bottom: 8px;
+  }
+  .ca-desc {
+    font-size: 13px; line-height: 1.65;
+    color: rgba(255, 255, 255, 0.68);
+    margin-bottom: 20px;
+  }
+  .ca-btn {
+    width: 100%; padding: 13px; border: none; border-radius: 999px;
+    font-size: 13.5px; font-weight: 700; letter-spacing: 0.5px;
+    color: #fff; cursor: pointer;
+    background: linear-gradient(90deg, #e84393, #8e7cf3);
+    box-shadow: 0 6px 22px rgba(232, 67, 147, 0.4);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .ca-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(232, 67, 147, 0.55);
+  }
+
+  /* rakit pc */
+  .pc-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  .pc-field label {
+    display:block; font-size:10.5px; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:rgba(255,255,255,.6); margin-bottom:6px;
+  }
+  .pc-field select {
+    width:100%; padding:10px 12px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.15);
+    background:#1c1c34; color:#fff; font-size:13px; outline:none; cursor:pointer;
+  }
+  .pc-field select:focus { border-color:#a29bfe; }
+  .pc-field select option:disabled { color:#777; }
+  .compat {
+    margin-top:14px; font-size:12px; line-height:1.6; font-weight:600;
+    padding:12px 14px; border-radius:10px; display:none;
+  }
+  .compat.err { display:block; border:1px solid rgba(255,80,80,.5); background:rgba(255,80,80,.08); color:#ff8a8a; }
+  .compat.ok  { display:block; border:1px solid rgba(0,230,168,.4); background:rgba(0,230,168,.06); color:#7cf0cd; }
+  .totalbox {
+    margin-top:18px; padding:16px 18px; border-radius:14px;
+    background:linear-gradient(135deg, rgba(108,92,231,.18), rgba(0,210,255,.1));
+    border:1px solid rgba(162,155,254,.3);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .totalbox .lbl { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .totalbox .amt { font-size:22px; font-weight:800; font-variant-numeric:tabular-nums;
+    background:linear-gradient(90deg,#a29bfe,#00d2ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .bott { margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,.1); }
+  .bott h3 { font-size:15px; font-weight:800; letter-spacing:.5px; }
+  .bott .sub2 { font-size:11.5px; color:rgba(255,255,255,.5); margin:4px 0 12px; }
+  .bott .btn-full { margin-top:10px; }
+  .bottres { display:none; margin-top:14px; padding:16px; border-radius:14px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(162,155,254,.3); }
+  .bottres.show { display:block; }
+  .brow { display:flex; justify-content:space-between; align-items:center; padding:7px 0; font-size:13px; }
+  .brow .k { color:rgba(255,255,255,.6); }
+  .brow .v { font-weight:800; font-size:15px; }
+  .brow .v.good { color:#00e6a8; } .brow .v.mid { color:#fdcb6e; } .brow .v.bad { color:#ff8a8a; }
+  .bnote { margin-top:10px; font-size:11.5px; line-height:1.5; color:rgba(255,255,255,.5); }
+  .note {
+    margin-top:12px; font-size:11.5px; line-height:1.55; color:rgba(255,255,255,.45);
+    padding:10px 14px; border-radius:10px; border:1px dashed rgba(255,255,255,.2);
+    background:rgba(253,203,110,.06);
+  }
+
+  /* nota pembelian */
+  .nota-item {
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:11px 0; border-bottom:1px dashed rgba(255,255,255,.12); font-size:13px;
+  }
+  .nota-item:last-of-type { border-bottom:none; }
+  .nota-item .ni-l { flex:1; min-width:0; }
+  .nota-item .ni-cat { font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.4); }
+  .nota-item .ni-name { font-weight:600; margin-top:2px; }
+  .nota-item .ni-price { font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .nota-total {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:14px; padding:14px 16px; border-radius:12px;
+    background:linear-gradient(135deg, rgba(108,92,231,.18), rgba(0,210,255,.1));
+    border:1px solid rgba(162,155,254,.35);
+  }
+  .nota-total .t-lbl { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.6); }
+  .nota-total .t-amt { font-size:20px; font-weight:800; font-variant-numeric:tabular-nums;
+    background:linear-gradient(90deg,#a29bfe,#00d2ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .shopee-row {
+    margin-top:14px; padding:14px 16px; border-radius:12px;
+    background:rgba(238,77,45,.08); border:1px solid rgba(238,77,45,.35);
+    text-align:center;
+  }
+  .shopee-row p { font-size:11.5px; color:rgba(255,255,255,.6); margin-bottom:10px; line-height:1.5; }
+
+  /* Pastikan kontainer full screen menutupi layar tanpa celah header luar */
+  .overlay.full { padding: 0; z-index: 99999; }
+  .overlay.full .fullwrap {
+    width: 100vw; 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column;
+    background: #0F1115;
+    position: fixed;
+    inset: 0;
+  }
+  .overlay.full iframe {
+    flex: 1; 
+    width: 100%; 
+    height: 100%;
+    border: none; 
+    background: #0F1115;
+  }
+
+  /* ===== popup OBS pilihan ===== */
+  .obsbox {
+    padding:18px; border-radius:14px; margin-bottom:16px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  }
+  .obsbox .obs-title { font-size:14.5px; font-weight:800; margin-bottom:8px; }
+  .obslist { margin:0 0 12px 18px; font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.6); }
+  .quotebox {
+    font-style:italic; text-align:center;
+    font-size:14px; line-height:1.9; color:rgba(255,255,255,.85);
+    padding:16px 18px; margin-bottom:22px;
+    border-left:3px solid #a29bfe; border-radius:0 12px 12px 0;
+    background:rgba(162,155,254,.07);
+  }
+
+  /* toast notifikasi */
+  .toast {
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px);
+    z-index:99; padding:14px 26px; border-radius:14px;
+    background:rgba(20,20,40,.95); border:1px solid rgba(162,155,254,.4);
+    backdrop-filter:blur(14px); font-size:13.5px; font-weight:600;
+    box-shadow:0 15px 45px rgba(0,0,0,.55);
+    opacity:0; transition:.35s; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .toast.ok { border-color:rgba(0,230,168,.6); }
+  .toast.warn { border-color:rgba(253,203,110,.6); }
+
+  /* ===== support chat 24/7 ===== */
+  .support-fab {
+    position:fixed; bottom:24px; right:24px; z-index:80;
+    width:60px; height:60px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(135deg,#6c5ce7,#8e7cf3);
+    box-shadow:0 8px 30px rgba(108,92,231,.55);
+    color:#fff; font-size:24px; transition:.25s;
+  }
+  .support-fab:hover { transform:scale(1.08); }
+  .support-fab::after {
+    content:"24/7"; position:absolute; top:-4px; right:-4px;
+    font-size:8px; font-weight:800; letter-spacing:.5px;
+    background:#00e6a8; color:#04231b; border-radius:999px; padding:3px 6px;
+    box-shadow:0 2px 8px rgba(0,230,168,.5);
+  }
+  .header-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-left:auto; flex:0 0 auto; }
+  header { position:relative; z-index:10; }
+  header .brand { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2; pointer-events:none; white-space:nowrap; }
+  header .clockbox { flex:1 1 0; }
+  header .header-actions { flex:1 1 0; }
+  .notice-wrap { position:relative; display:inline-flex; z-index:2147483646; }
+  .notice-btn { width:38px; height:38px; border-radius:11px; border:1px solid rgba(162,155,254,.35); background:rgba(162,155,254,.12); color:#fff; cursor:pointer; font-size:18px; position:relative; }
+  .notice-btn::after { content:""; position:absolute; width:7px; height:7px; border-radius:50%; background:#ff5b6e; top:7px; right:7px; box-shadow:0 0 8px #ff5b6e; }
+  .notice-panel { display:none; position:fixed; top:82px; right:24px; width:min(310px, calc(100vw - 28px)); max-height:calc(100vh - 100px); overflow:auto; padding:16px; border-radius:15px; background:rgba(20,20,40,.99); border:1px solid rgba(162,155,254,.4); box-shadow:0 18px 45px rgba(0,0,0,.65); z-index:2147483647 !important; }
+  .notice-panel.show { display:block; animation:pop .2s ease; }
+  .notice-panel h3 { font-size:14px; margin-bottom:8px; color:#fff; }
+  .notice-panel p { font-size:12px; line-height:1.7; color:rgba(255,255,255,.72); margin:0 0 8px; }
+  .notice-panel .notice-foot { color:#00e6a8; font-weight:700; margin-bottom:0; }
+  .chatbox {
+    position:fixed; bottom:96px; right:24px; z-index:81;
+    width:320px; max-width:calc(100vw - 32px); height:440px;
+    display:none; flex-direction:column;
+    background:rgba(20,20,40,.97); border:1px solid rgba(162,155,254,.35);
+    border-radius:20px; overflow:hidden; backdrop-filter:blur(16px);
+    box-shadow:0 25px 70px rgba(0,0,0,.6);
+  }
+  .chatbox.show { display:flex; animation:pop .25s ease; }
+  .chathead {
+    display:flex; align-items:center; gap:10px; padding:14px 16px;
+    background:linear-gradient(90deg, rgba(108,92,231,.35), rgba(0,210,255,.18));
+    border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .chathead .avatar {
+    width:38px; height:38px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    background:linear-gradient(135deg,#6c5ce7,#00d2ff);
+  }
+  .chathead .cname { font-size:14px; font-weight:800; }
+  .chathead .cstat { font-size:10px; color:#00e6a8; letter-spacing:1px; }
+  .chathead .closex2 {
+    margin-left:auto; background:none; border:none; color:rgba(255,255,255,.6);
+    font-size:18px; cursor:pointer;
+  }
+  .chatlog { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .msg { max-width:80%; padding:10px 14px; border-radius:14px; font-size:12.5px; line-height:1.55; }
+  .msg.bot { align-self:flex-start; background:rgba(108,92,231,.18); border:1px solid rgba(162,155,254,.3); border-bottom-left-radius:4px; }
+  .msg.user { align-self:flex-end; background:linear-gradient(90deg,#6c5ce7,#8e7cf3); border-bottom-right-radius:4px; }
+  .msg.typing { font-style: italic; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05); }
+  .chatinput { display:flex; gap:8px; padding:12px; border-top:1px solid rgba(255,255,255,.1); }
+  .chatinput input {
+    flex:1; padding:11px 14px; border-radius:999px; font-size:12.5px;
+    border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#fff; outline:none;
+  }
+  .chatinput input:focus { border-color:#a29bfe; }
+  .chatinput button {
+    width:42px; height:42px; flex:none; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(135deg,#6c5ce7,#8e7cf3); color:#fff; font-size:16px;
+  }
+
+  @media (max-width:860px){
+    .grid { grid-template-columns:repeat(2,1fr); }
+    .brand { font-size:30px; }
+  }
+  @media (max-width:560px){
+    .grid { grid-template-columns:1fr; }
+    header { flex-direction:row; text-align:left; align-items:center; padding:14px 16px; gap:8px; }
+    .clockbox { flex:1 1 auto; min-width:0; text-align:left; }
+    .clockbox .jam { font-size:18px; }
+    .clockbox .tgl { font-size:9px; letter-spacing:1px; }
+    .brand { font-size:25px; letter-spacing:3px; }
+    .auth { margin-left:auto; text-align:right; flex:0 0 auto; gap:5px; }
+    .auth .btn { margin:0; padding:8px 10px; font-size:10px; }
+    .notice-btn { width:34px; height:34px; }
+    .pc-grid { grid-template-columns:1fr; }
+    .chatbox { height:60vh; bottom:88px; }
+  }
+
+  /* ===== loading effect ===== */
+  .loadwrap { position:fixed; inset:0; z-index:20000; display:none; align-items:center; justify-content:center; background:rgba(10,10,20,.92); backdrop-filter:blur(4px); }
+  .loadwrap.show { display:flex; }
+  .loadbox { text-align:center; }
+  .spinner { width:64px; height:64px; margin:0 auto 20px; border-radius:50%; border:5px solid rgba(162,155,254,.2); border-top-color:#a29bfe; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loadtext { font-size:14px; font-weight:700; color:rgba(255,255,255,.85); letter-spacing:1px; }
+  .loadsub { font-size:12px; color:rgba(255,255,255,.45); margin-top:6px; }
+
+  /* ===== testimoni pojok kiri bawah ===== */
+  .testimonial-toast {
+    position:fixed; left:22px; bottom:22px; z-index:70;
+    width:min(370px, calc(100vw - 44px));
+    padding:13px 16px; border-radius:14px;
+    background:rgba(20,20,40,.94);
+    border:1px solid rgba(162,155,254,.38);
+    box-shadow:0 12px 38px rgba(0,0,0,.48), 0 0 24px rgba(108,92,231,.14);
+    backdrop-filter:blur(16px);
+    opacity:0; transform:translateY(14px);
+    transition:opacity .35s ease, transform .35s ease;
+    cursor:pointer;
+  }
+  .testimonial-toast.show { opacity:1; transform:translateY(0); }
+  .testimonial-label {
+    display:flex; align-items:center; gap:7px;
+    color:#a29bfe; font-size:9px; font-weight:800;
+    letter-spacing:1.8px; text-transform:uppercase; margin-bottom:6px;
+  }
+  .testimonial-label span { color:#00e6a8; font-size:12px; }
+  .testimonial-name { font-size:12px; font-weight:800; color:#fff; margin-bottom:3px; }
+  .testimonial-message { font-size:12px; line-height:1.5; color:rgba(255,255,255,.72); }
+  
+  /* Style bubble untuk popup chat testimoni */
+  .testi-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    background: rgba(108,92,231,.18);
+    border: 1px solid rgba(162,155,254,.3);
+    align-self: flex-start;
+  }
+  .testi-bubble .t-user {
+    font-weight: 800;
+    font-size: 11px;
+    color: #a29bfe;
+    margin-bottom: 3px;
+    display: block;
+  }
+  @media(max-width:560px) {
+    .testimonial-toast { left:12px; bottom:12px; width:min(340px, calc(100vw - 24px)); }
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+<div class="glow g3"></div>
+
+<header>
+  <div class="clockbox">
+    <div class="jam" id="jam">--:--:-- WIB</div>
+    <div class="tgl" id="tgl">—</div>
+  </div>
+  <div class="brand">ALI</div>
+  <div class="auth header-actions" id="authHeaderBox">
+    <div class="notice-wrap">
+      <button class="notice-btn" onclick="toggleNotice()" aria-label="Buka notifikasi" title="Notifikasi ALI">🔔</button>
+      <div class="notice-panel" id="noticePanel">
+        <h3 id="noticeTitle">👋 Halo, Selamat Datang di Website ALI!</h3>
+        <p id="noticeText">Selamat datang di ALI! 🚀 Nikmati berbagai tools gratis untuk streaming, gaming, dan kebutuhan PC. Buat overlay OBS, susun rakitan PC impian, dan temukan fitur menarik lainnya. Jangan lupa jelajahi website dan bagikan ke teman-temanmu!</p>
+        <p id="noticeFoot" class="notice-foot">💜 ALI dibuat untuk membantu gamer dan content creator berkembang. Terima kasih sudah berkunjung — semoga betah dan selamat menjelajah!</p>
+      </div>
+    </div>
+    <span id="guestButtons">
+      <a class="btn ghost" id="registerBtn" onclick="openModal('ovDaftar')">DAFTAR</a>
+      <a class="btn solid" id="loginBtn" onclick="openModal('ovLogin')">LOGIN</a>
+    </span>
+    <span id="userProfileBox" style="display:none; align-items:center; gap:8px;">
+      <span id="loggedUsernameDisplay" style="font-size:12px; font-weight:700; color:#00e6a8;"></span>
+      <button class="btn ghost small" onclick="doLogout()">LOGOUT</button>
+    </span>
+  </div>
+</header>
+
+<div class="aboutbar"><a onclick="openModal('ovAbout')">About Me</a></div>
+
+<main>
+  <div class="grid">
+
+    <div class="card" onclick="bukaKartu('MEMBUKA OVERLAY & STREAM TOOLS...', () => openModal('ovObs'))" style="--c:#6c5ce7; --glow:rgba(108,92,231,.35)">
+      <div class="icon">🎬</div>
+      <h3>OBS / Steam Overlay Generator</h3>
+      <p>Buat overlay streaming & gaming custom dengan mudah.</p>
+      <span class="badge live">● Live</span>
+    </div>
+
+    <div class="card" onclick="bukaKartu('MEMBUKA KALKULATOR RAKIT PC...', () => openModal('ovRakit'))" style="--c:#00d2ff; --glow:rgba(0,210,255,.3)">
+      <div class="icon">🖥️</div>
+      <h3>Rakit PC</h3>
+      <p>Jasa rakit PC sesuai budget & kebutuhan kamu.</p>
+      <span class="badge live">● Live</span>
+    </div>
+
+    <div class="card" onclick="bukaKartu('MEMBUKA BELI ROCKSTAR GTA V...', () => openModal('ovRockstar'))" style="--c:#00e6a8; --glow:rgba(0,230,168,.25)">
+      <div class="icon">🚗</div>
+      <h3>Beli Rockstar GTA V</h3>
+      <p>Akun rockstar original biar bisa main FiveM.</p>
+      <span class="badge live">● Live</span>
+    </div>
+
+   <div class="card" onclick="bukaKartu('MEMUAT FITUR...', () => bukaSoon('Custom Alert'))" style="--c:#e84393; --glow:rgba(232,67,147,.3)">
+      <div class="icon">🔔</div>
+      <h3>Custom Alert</h3>
+      <p>Buat custom alert HTML dan CSS sesuai keinginanmu dengan mudah.</p>
+      <span class="badge">Coming Soon</span>
+    </div>
+
+    <div class="card" onclick="bukaKartu('MEMUAT FITUR...', () => bukaSoon('Top Up Game Murah'))" style="--c:#fdcb6e; --glow:rgba(253,203,110,.25)">
+      <div class="icon">🎮</div>
+      <h3>Top Up Game Murah</h3>
+      <p>Top up diamond, UC, dan voucher harga termurah.</p>
+      <span class="badge">Coming Soon</span>
+    </div>
+
+    <div class="card" onclick="bukaKartu('MEMUAT FITUR...', () => bukaSoon('Segera Hadir'))" style="--c:#a29bfe; --glow:rgba(162,155,254,.3)">
+      <div class="icon">✨</div>
+      <h3>Segera Hadir</h3>
+      <p>Fitur baru lainnya sedang dalam pengembangan.</p>
+      <span class="badge">Coming Soon</span>
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== CUSTOM ALERT: JUAL USAHA MU DISINI ===== -->
+<div class="overlay" id="ovJualUsaha">
+  <div class="custom-alert-card">
+    <button class="closex" onclick="closeModal('ovJualUsaha')">✕</button>
+    <div class="ca-icon-wrap">🛍️</div>
+    <div class="ca-pill">🚧 Coming Soon</div>
+    <h2 class="ca-title">Jual Usaha Mu Disini</h2>
+    <p class="ca-desc">
+      Fitur promosi & lapak usaha di platform <b style="color:#fff;">ALI</b> masih dalam tahap pengembangan.<br><br>
+      Nantikan segera tempat terbaik untuk mempromosikan produk & jasamu! 🚀
+    </p>
+    <button class="ca-btn" onclick="closeModal('ovJualUsaha')">Oke, Siap Ditunggu!</button>
+  </div>
+</div>
+
+<!-- ===== POPUP LOGIN ===== -->
+<div class="overlay" id="ovLogin">
+  <div class="modal">
+    <button class="closex" onclick="closeModal('ovLogin')">✕</button>
+    <h2>Login</h2>
+    <p class="sub">Masuk ke akun ALI kamu</p>
+    <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="masukkan username"></div>
+    <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="password"></div>
+    <button class="btn solid btn-full" onclick="doLogin()">LOGIN</button>
+    <p class="foot">Belum punya akun? <a onclick="switchModal('ovLogin','ovDaftar')">Daftar</a></p>
+  </div>
+</div>
+
+<!-- ===== POPUP DAFTAR ===== -->
+<div class="overlay" id="ovDaftar">
+  <div class="modal">
+    <button class="closex" onclick="closeModal('ovDaftar')">✕</button>
+    <h2>Daftar</h2>
+    <p class="sub">Buat akun ALI baru (tersimpan otomatis di browser)</p>
+    <div class="field"><label>Username</label><input type="text" id="daftarUser" placeholder="username"></div>
+    <div class="field"><label>Email</label><input type="email" id="daftarEmail" placeholder="email"></div>
+    <div class="field"><label>Password</label><input type="password" id="daftarPass" placeholder="password"></div>
+    <button class="btn solid btn-full" onclick="doDaftar()">DAFTAR</button>
+    <p class="foot">Sudah punya akun? <a onclick="switchModal('ovDaftar','ovLogin')">Login</a></p>
+  </div>
+</div>
+
+<!-- ===== POPUP RAKIT PC ===== -->
+<div class="overlay" id="ovRakit">
+  <div class="modal wide">
+    <button class="closex" onclick="closeModal('ovRakit')">✕</button>
+    <h2>Rakit PC</h2>
+    <p class="sub">Pilih komponen sesuai budget kamu · harga update per November 2026 (pasar Indonesia)</p>
+    <div class="pc-grid">
+      <div class="pc-field"><label>Prosesor</label><select id="cpu" onchange="hitung()">
+        <option value="0">— Pilih prosesor —</option>
+        <option value="2000000" data-socket="LGA1700" data-score="60" data-link="https://s.shopee.co.id/50aYQJXcbK">Intel Core i3-12100F (LGA1700) — Rp 2.000.000</option>
+        <option value="1700000" data-socket="AM4" data-score="70" data-link="https://s.shopee.co.id/3qOb1KG29h">AMD Ryzen 5 5600 (AM4) — Rp 1.700.000</option>
+        <option value="3590000" data-socket="LGA1700" data-score="72" data-link="https://s.shopee.co.id/5fqFDYeIuj">Intel Core i5-12400F (LGA1700) — Rp 3.590.000</option>
+        <option value="3100000" data-socket="AM4" data-score="85" data-link="https://s.shopee.co.id/2gCddHLLq5">AMD Ryzen 7 5700X (AM4) — Rp 3.100.000</option>
+        <option value="3600000" data-socket="LGA1700" data-score="100" data-link="https://s.shopee.co.id/qkzShLsDz">Intel Core i5-13400F (LGA1700) — Rp 3.600.000</option>
+        <option value="2600000" data-socket="AM5" data-score="105" data-link="https://s.shopee.co.id/70Lco2XWi7">AMD Ryzen 5 7600 (AM5) — Rp 2.600.000</option>
+      </select></div>
+      <div class="pc-field"><label>Motherboard</label><select id="mobo" onchange="hitung()">
+        <option value="0">— Pilih motherboard —</option>
+        <option value="1000000" data-socket="AM4" data-mem="ddr4" data-link="https://s.shopee.co.id/9zzENZ8VFF">ASRock A520M (AM4, DDR4) — Rp 1.000.000</option>
+        <option value="1200000" data-socket="LGA1700" data-mem="ddr4" data-link="https://s.shopee.co.id/5Atyci0WOq">MSI H610M PRO (LGA1700, DDR4) — Rp 1.200.000</option>
+        <option value="1800000" data-socket="AM4" data-mem="ddr4" data-link="https://s.shopee.co.id/8Kr0OXoGib">ASUS B550M-K (AM4, DDR4) — Rp 1.800.000</option>
+        <option value="2200000" data-socket="LGA1700" data-mem="ddr4" data-link="https://s.shopee.co.id/2qW3qSDoyP">Gigabyte B660M DS3H (LGA1700, DDR4) — Rp 2.200.000</option>
+        <option value="2400000" data-socket="AM5" data-mem="ddr5" data-link="https://s.shopee.co.id/W894BGWet">MSI B650M PRO (AM5, DDR5) — Rp 2.400.000</option>
+      </select></div>
+      <div class="pc-field"><label>RAM</label><select id="ram" onchange="hitung()">
+        <option value="0">— Pilih RAM —</option>
+        <option value="1100000" data-mem="ddr4" data-link="https://s.shopee.co.id/BVIfelKS4">8GB DDR4 3200MHz — Rp 1.100.000</option>
+        <option value="2780000" data-mem="ddr4" data-link="https://s.shopee.co.id/6AmVoi653a">16GB DDR4 3600MHz — Rp 2.780.000</option>
+        <option value="4850000" data-mem="ddr4" data-link="https://s.shopee.co.id/1qdWenp41d">32GB DDR4 3600MHz — Rp 4.850.000</option>
+        <option value="750000" data-mem="ddr5" disabled>16GB DDR5 5600 — STOK HABIS</option>
+        <option value="10000000" data-mem="ddr5" data-link="https://s.shopee.co.id/8fTqnPx2GK">32GB DDR5 5600 — Rp 10.000.000</option>
+      </select></div>
+      <div class="pc-field"><label>SSD</label><select id="ssd" onchange="hitung()">
+        <option value="0">— Pilih SSD —</option>
+        <option value="800000" disabled>256GB NVMe — STOK HABIS</option>
+        <option value="1600000" data-link="https://s.shopee.co.id/6VPMDWY8Aa">512GB NVMe — Rp 1.600.000</option>
+        <option value="2500000" data-link="https://s.shopee.co.id/qkzT8SZBd">1TB NVMe Gen3 — Rp 2.500.000</option>
+        <option value="3000000" data-link="https://s.shopee.co.id/9fMNzNvMKF">1TB NVMe Gen4 — Rp 3.000.000</option>
+        <option value="4500000" data-link="https://s.shopee.co.id/40i1EzCx9s">2TB NVMe Gen4 — Rp 4.500.000</option>
+      </select></div>
+      <div class="pc-field"><label>Kartu Grafis (GPU)</label><select id="gpu" onchange="hitung()">
+        <option value="0" data-score="10" data-watt="0">Pakai iGPU (tanpa GPU) — Rp 0</option>
+        <option value="5300000" data-score="45" data-watt="130" data-link="https://s.shopee.co.id/5Atyd9fejm">RTX 3050 8GB — Rp 5.300.000</option>
+        <option value="5100000" data-score="65" data-watt="132" disabled>RX 6600 8GB — STOK HABIS</option>
+        <option value="7800000" data-score="75" data-watt="170" data-link="https://s.shopee.co.id/8fTqnbl6iJ">RTX 3060 12GB — Rp 7.800.000</option>
+        <option value="8500000" data-score="85" data-watt="115" disabled>RTX 4060 8GB — STOK HABIS</option>
+        <option value="9000000" data-score="100" data-watt="160" data-link="https://s.shopee.co.id/4VeHq2Kwrz">RTX 4060 Ti 8GB — Rp 9.000.000</option>
+        <option value="10000000" data-score="115" data-watt="145" data-link="https://s.shopee.co.id/3B8uFc6nC4">RTX 5060 8GB — Rp 10.000.000</option>
+      </select></div>
+      <div class="pc-field"><label>Power Supply (PSU)</label><select id="psu" onchange="hitung()">
+        <option value="0">— Pilih PSU —</option>
+        <option value="480000" disabled>450W Standard — STOK HABIS</option>
+        <option value="780000" data-link="https://s.shopee.co.id/AUvUz78J4j">550W 80+ Bronze — Rp 780.000</option>
+        <option value="1600000" data-link="https://s.shopee.co.id/W894lKL2d">650W 80+ Gold — Rp 1.600.000</option>
+        <option value="2000000" data-link="https://s.shopee.co.id/6L5w1VSWdg">750W 80+ Gold — Rp 2.000.000</option>
+      </select></div>
+      <div class="pc-field"><label>Casing</label><select id="casing" onchange="hitung()">
+        <option value="0">— Pilih casing —</option>
+        <option value="300000" disabled>mATX Mini — STOK HABIS</option>
+        <option value="550000" disabled>ATX Mid Tower — STOK HABIS</option>
+        <option value="650000" disabled>ATX Mesh RGB + 4 Fan — STOK HABIS</option>
+      </select></div>
+      <div class="pc-field"><label>Pendingin</label><select id="cooler" onchange="hitung()">
+        <option value="0">Stock cooler — Rp 0</option>
+        <option value="220000" disabled>Air Cooler Tower — STOK HABIS</option>
+        <option value="850000" disabled>AIO Liquid 240mm — STOK HABIS</option>
+      </select></div>
+    </div>
+    <div id="compat" class="compat"></div>
+    <div class="totalbox">
+      <span class="lbl">Total Perkiraan</span>
+      <span class="amt" id="total">Rp 0</span>
+    </div>
+    <div class="bott">
+      <h3>🧮 Kalkulator Bottleneck — FiveM</h3>
+      <p class="sub2">Perkiraan performa & bottleneck berdasarkan CPU + GPU yang kamu pilih di atas.</p>
+      <button class="btn solid btn-full" onclick="cekBottleneck()">CEK BOTTLENECK FIVEM</button>
+      <div class="bottres" id="bottres">
+        <div class="brow"><span class="k">Perkiraan FPS — 1080p (High)</span><span class="v" id="fps1080">—</span></div>
+        <div class="brow"><span class="k">Perkiraan FPS — 1440p (High)</span><span class="v" id="fps1440">—</span></div>
+        <div class="brow"><span class="k">Tingkat Bottleneck</span><span class="v" id="bval">—</span></div>
+        <div class="brow"><span class="k">Komponen penentu (limit)</span><span class="v" id="blimit">—</span></div>
+        <div class="bnote" id="bnote"></div>
+      </div>
+    </div>
+    <div class="note">⚠️ <b>Note:</b> Kemungkinan harga tidak sesuai dengan pasar dikarenakan harga PC saat ini masih tidak menentu. Harga di atas merupakan perkiraan pasar Indonesia per <b>November 2026</b> dan dapat berubah sewaktu-waktu.</div>
+    <button class="btn solid btn-full" onclick="keNota()">LANJUT KE PEMBELIAN →</button>
+  </div>
+</div>
+
+<!-- ===== LOADING OVERLAY ===== -->
+<div class="loadwrap" id="loadOverlay">
+  <div class="loadbox">
+    <div class="spinner"></div>
+    <div class="loadtext" id="loadText">MEMUAT...</div>
+    <div class="loadsub">Mohon tunggu sebentar ya 😊</div>
+  </div>
+</div>
+
+<!-- ===== POPUP PILIHAN OBS / OVERLAY ===== -->
+<div class="overlay" id="ovObs">
+  <div class="modal wide">
+    <button class="closex" onclick="closeModal('ovObs')">✕</button>
+    <h2>🎬 Overlay & Stream Tools</h2>
+    <p class="sub">Pilih fitur yang mau kamu pakai</p>
+    <div class="obsbox">
+      <div class="obs-title">🖼️ Overlay — Media Sosial & Saweran</div>
+      <ul class="obslist"><li>Menarik perhatian penonton saat live</li></ul>
+      <button class="btn solid btn-full" onclick="bukaTool('ovObs','ovGen','MEMBUKA OVERLAY GENERATOR...')">BUKA OVERLAY GENERATOR →</button>
+    </div>
+    <div class="obsbox">
+      <div class="obs-title">⏱️ OBS Countdown Timer Generator</div>
+      <ul class="obslist">
+        <li>Menghitung mundur stream sebelum mulai</li>
+      </ul>
+      <button class="btn solid btn-full" onclick="bukaTool('ovObs','ovCount','MEMBUKA COUNTDOWN TIMER...')">BUKA COUNTDOWN TIMER →</button>
+    </div>
+    <div class="obsbox">
+      <div class="obs-title">🏆 OBS Stream Credits Generator</div>
+      <p class="obslist" style="margin:0 0 4px; list-style:none;">Memunculkan Nama Penggemar Anda:</p>
+      <ul class="obslist">
+        <li>Chatters</li>
+        <li>Donatur</li>
+        <li>Moderator</li>
+        <li>Dan banyak lagi</li>
+      </ul>
+      <button class="btn solid btn-full" onclick="bukaTool('ovObs','ovCredits','MEMBUKA CREDITS GENERATOR...')">BUKA CREDITS GENERATOR →</button>
+    </div>
+    <div class="obsbox">
+      <div class="obs-title">🔔 SmartStream — Integrasi YouTube</div>
+      <ul class="obslist">
+        <li>Superchat muncul jadi alert</li>
+        <li>Trigger dari member & subscribe</li>
+        <li>Setup sekali lewat OBS/Streamlabs</li>
+      </ul>
+      <button class="btn solid btn-full" onclick="switchModal('ovObs','ovSoon')">BELUM TERSEDIA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== POPUP BELUM TERSEDIA ===== -->
+<div class="overlay" id="ovSoon">
+  <div class="modal" style="max-width:360px; text-align:center;">
+    <button class="closex" onclick="closeModal('ovSoon')">✕</button>
+    <div style="font-size:44px; margin:8px 0 10px;">🚧</div>
+    <h2 style="font-size:18px;">Belum Tersedia</h2>
+    <p class="sub" style="margin-top:8px; margin-bottom:6px;">Fitur SmartStream masih dalam pengembangan.<br>Nantikan update berikutnya ya!</p>
+    <button class="btn solid btn-full" onclick="closeModal('ovSoon'); openModal('ovObs');">Oke, Kembali</button>
+  </div>
+</div>
+
+<!-- ===== POPUP ABOUT ME ===== -->
+<div class="overlay" id="ovAbout">
+  <div class="modal">
+    <button class="closex" onclick="closeModal('ovAbout')">✕</button>
+    <h2>About Me</h2>
+    <p class="sub">Kenalan dulu sama pemiliknya 👋</p>
+    <div class="quotebox">
+      "Saya hanyalah orang biasa yang ga biasa tapi ga biasa biasa amat tapi biasa aja sih ya biasa gitu biasa" 😄
+    </div>
+    <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+      <a class="btn ghost" onclick="openModal('ovIG')" style="margin:0;">📷 Instagram</a>
+      <a class="btn ghost" href="https://www.tiktok.com/@fadlilalyy" target="_blank" rel="noopener" style="margin:0; text-decoration:none;">🎵 TikTok</a>
+      <a class="btn ghost" href="https://www.youtube.com/@fadlilalyy" target="_blank" rel="noopener" style="margin:0; text-decoration:none;">▶️ YouTube</a>
+    </div>
+    <a class="btn btn-full" href="#" onclick="openSupportModal(); return false;" style="margin-top:14px; text-decoration:none; background:linear-gradient(90deg,#f59e0b,#f97316); box-shadow:0 4px 18px rgba(245,158,11,.4);">💛 Support</a>
+    <button class="btn solid btn-full" style="margin-top:10px;" onclick="switchModal('ovAbout','ovSaran')">✉️ Kirim Saran</button>
+  </div>
+</div>
+
+<!-- ===== POPUP KIRIM SARAN ===== -->
+<div class="overlay" id="ovSaran">
+  <div class="modal">
+    <button class="closex" onclick="closeModal('ovSaran')">✕</button>
+    <h2>✉️ Kritik & Saran</h2>
+    <p class="sub">Pesan terkirim langsung ke owner</p>
+    <form id="formSaran" action="https://formsubmit.co/fajeeinfo@gmail.com" method="POST" onsubmit="return kirimSaran(event)">
+      <input type="hidden" name="_subject" value="Kritik & Saran baru dari website ALI">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="nama" placeholder="Nama kamu (boleh samaran)" required style="width:100%; padding:12px 14px; margin-bottom:10px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); color:#fff; font-size:13px; box-sizing:border-box;">
+      <input type="email" name="email" placeholder="Email kamu (untuk dibalas, opsional)" style="width:100%; padding:12px 14px; margin-bottom:10px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); color:#fff; font-size:13px; box-sizing:border-box;">
+      <textarea name="pesan" placeholder="Tulis kritik / saran kamu di sini..." rows="4" required style="width:100%; padding:12px 14px; margin-bottom:14px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); color:#fff; font-size:13px; resize:vertical; box-sizing:border-box;"></textarea>
+      <button type="submit" class="btn solid btn-full">📨 KIRIM SEKARANG</button>
+    </form>
+    <p class="foot" style="margin-top:12px;">Pesan terkirim langsung ke owner 📬</p>
+  </div>
+</div>
+
+<!-- ===== POPUP SUPPORT ===== -->
+<div class="overlay" id="ovSupport">
+  <div class="modal" style="max-width:400px; text-align:center;">
+    <button class="closex" onclick="closeModal('ovSupport')">✕</button>
+    <div style="font-size:44px; margin:8px 0 10px;">💛</div>
+    <h2 style="font-size:20px;">Support / Donasi</h2>
+    <p class="sub" style="margin-top:10px; margin-bottom:14px; font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.65); text-align:center;">
+      <b style="color:#fff;">Donasi 100% sukarela</b> — tanpa paksaan.<br>
+      Semua fitur tetap <b style="color:#fff;">gratis</b>. 🙏
+    </p>
+    <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); cursor:pointer; text-align:left; margin-bottom:14px;">
+      <input type="checkbox" id="supportAgree" onchange="toggleSupportIdx()" style="margin-top:2px; width:16px; height:16px; accent-color:#8e7cf3; cursor:pointer;">
+      <span style="font-size:12px; line-height:1.6; color:rgba(255,255,255,.75);">Saya setuju: donasi ini <b style="color:#fff;">sukarela</b> & <b style="color:#fff;">tidak dapat ditarik kembali</b>.</span>
+    </label>
+    <button id="btnSupportIdx" class="btn btn-full" disabled style="opacity:.5; background:linear-gradient(90deg,#f59e0b,#f97316); box-shadow:0 4px 18px rgba(245,158,11,.4);" onclick="supportNowIdx()">💛 Support Sekarang</button>
+    <button class="btn btn-full" style="margin-top:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.7);" onclick="closeModal('ovSupport')">Nanti Saja</button>
+  </div>
+</div>
+
+<!-- ===== POPUP IG TIDAK TERSEDIA ===== -->
+<div class="overlay" id="ovIG">
+  <div class="modal" style="max-width:360px; text-align:center;">
+    <button class="closex" onclick="closeModal('ovIG')">✕</button>
+    <div style="font-size:44px; margin:8px 0 10px;">📵</div>
+    <h2 style="font-size:18px;">Instagram Tidak Tersedia</h2>
+    <p class="sub" style="margin-top:8px; margin-bottom:6px;">Instagram tidak tersedia untuk saat ini.<br>Nantikan update berikutnya ya!</p>
+    <button class="btn solid btn-full" onclick="closeModal('ovIG')">Oke, Mengerti</button>
+  </div>
+</div>
+
+<!-- ===== POPUP NOTA PEMBELIAN ===== -->
+<div class="overlay" id="ovNota">
+  <div class="modal wide">
+    <button class="closex" onclick="closeModal('ovNota')">✕</button>
+    <h2>Detail Pembelian</h2>
+    <p class="sub">Nota rakitan PC kamu · klik tombol Shopee untuk beli tiap komponen</p>
+    <div id="notaList"></div>
+    <div class="nota-total">
+      <span class="t-lbl">Total Perkiraan</span>
+      <span class="t-amt" id="notaTotal">Rp 0</span>
+    </div>
+    <div class="note" style="margin-top:14px;">⚠️ Harga dapat berubah sewaktu-waktu mengikuti pasar. Pastikan kompatibilitas komponen sudah ✅ sebelum checkout.</div>
+    <div class="shopee-row">
+      <p>🛒 Semua komponen di atas tersedia di Shopee. Klik tombol oranye di samping tiap komponen untuk langsung ke produk, atau beli semuanya satu per satu.</p>
+      <button class="btn shopee btn-full" onclick="beliSemua()">🛒 BELI SEMUA KOMPONEN DI SHOPEE</button>
+      <div id="linkSemuaBox" style="display:none; margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== POPUP BELI ROCKSTAR GTA V ===== -->
+<div class="overlay" id="ovRockstar">
+  <div class="modal" style="max-width:420px;">
+    <button class="closex" onclick="closeModal('ovRockstar')">✕</button>
+    <div style="font-size:44px; text-align:center; margin:8px 0 10px;">🚗🎮</div>
+    <h2 style="font-size:20px; text-align:center;">Beli Rockstar GTA V</h2>
+    <p class="sub" style="text-align:center; margin-top:8px;">Akun Rockstar original biar bisa main FiveM · tersedia di Shopee</p>
+    <div class="note" style="text-align:left; background:rgba(0,230,168,.05); border-color:rgba(0,230,168,.3); color:rgba(255,255,255,.7);">
+      <div style="font-weight:800; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#00e6a8; margin-bottom:6px;">ℹ️ Keterangan</div>
+      <p style="margin:0 0 10px; line-height:1.65;">Seluruh tanggung jawab produk (stok, pengiriman, garansi & keluhan) berada di <b>toko penjual di Shopee</b>. Website ini hanya terkait sebagai <b>afiliasi</b>.</p>
+      <div style="font-weight:800; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#fdcb6e; margin-bottom:6px;">💡 Saran</div>
+      <p style="margin:0; line-height:1.65;">Lebih aman beli <b>lisensi key / redeem kode</b>, lalu masukkan kodenya <b>sendiri ke akun pribadi kamu</b> — jangan share ke siapa pun, supaya akun tetap 100% milik kamu.</p>
+    </div>
+    <a class="btn shopee btn-full" href="https://s.shopee.co.id/W897nABZz" target="_blank" rel="noopener" style="margin-top:16px; text-decoration:none; text-align:center;">🛒 BELI SEKARANG DI SHOPEE →</a>
+    <button class="btn btn-full" style="margin-top:10px; background:rgba(108,92,231,.12); border:1px solid rgba(162,155,254,.4); color:#cfc9ff;" onclick="closeModal('ovRockstar')">Nanti Saja</button>
+  </div>
+</div>
+
+<!-- ===== POPUP ALERT ===== -->
+<div class="overlay" id="ovAlert">
+  <div class="modal" style="max-width:380px; text-align:center;">
+    <button class="closex" onclick="closeModal('ovAlert')">✕</button>
+    <div style="font-size:44px; margin:8px 0 10px;">🔔</div>
+    <h2 style="font-size:19px;" id="alertTitle">Keterangan</h2>
+    <p class="sub" style="margin-top:10px; margin-bottom:6px; font-size:13.5px; line-height:1.7; color:rgba(255,255,255,.75);" id="alertMsg">—</p>
+    <button class="btn solid btn-full" onclick="closeModal('ovAlert')">Oke, Mengerti</button>
+  </div>
+</div>
+
+<!-- ===== POPUP COMING SOON ===== -->
+<div class="overlay" id="ovComing">
+  <div class="modal" style="max-width:360px; text-align:center;">
+    <button class="closex" onclick="closeModal('ovComing')">✕</button>
+    <div style="font-size:44px; margin:8px 0 6px;">🚧</div>
+    <h2 style="font-size:16px;" id="comingName">Top Up Game Murah</h2>
+    <div style="font-size:22px; font-weight:800; margin:2px 0 10px; background:linear-gradient(90deg,#a29bfe,#00d2ff); -webkit-background-clip:text; background-clip:text; color:transparent;">Coming Soon</div>
+    <p class="sub" style="margin-bottom:6px;">Fitur ini masih dalam tahap pengembangan.<br>Sabar ya, nantikan update berikutnya!</p>
+    <button class="btn solid btn-full" onclick="closeModal('ovComing')">Oke, Mengerti</button>
+  </div>
+</div>
+
+<!-- ===== POPUP GENERATOR OVERLAY ===== -->
+<div class="overlay full" id="ovGen">
+  <div class="fullwrap">
+    <iframe src="overlay-generator.html" title="OBS Overlay Generator"></iframe>
+  </div>
+</div>
+
+<!-- ===== POPUP COUNTDOWN TIMER ===== -->
+<div class="overlay full" id="ovCount">
+  <div class="fullwrap">
+    <iframe src="count.html" title="OBS Countdown Timer Generator"></iframe>
+  </div>
+</div>
+
+<!-- ===== POPUP CREDITS GENERATOR ===== -->
+<div class="overlay full" id="ovCredits">
+  <div class="fullwrap">
+    <iframe src="credits-generator.html" title="OBS Stream Credits Generator"></iframe>
+  </div>
+</div>
+
+<!-- ===== POPUP FULL CHAT TESTIMONI & KIRIM PESAN ===== -->
+<div class="overlay" id="ovTestimoniChat">
+  <div class="modal wide" style="max-width: 500px; height: 80vh; display: flex; flex-direction: column;">
+    <button class="closex" onclick="closeModal('ovTestimoniChat')">✕</button>
+    <h2>💬 Testimoni & Diskusi Pengguna</h2>
+    <p class="sub">Semua pesan tersimpan otomatis di database browser (LocalStorage). Kirim pesanmu (wajib login dulu)!</p>
+    
+    <!-- Kotak daftar pesan chat testimoni -->
+    <div id="testimoniChatLog" style="flex: 1; overflow-y: auto; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;"></div>
+
+    <!-- Area kirim pesan (wajib login) -->
+    <div style="display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px;">
+      <input type="text" id="inputTestimoniMsg" placeholder="Tulis testimoni/pesan kamu..." style="flex: 1; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.05); color: #fff; outline: none; font-size: 13px;" onkeydown="if(event.key==='Enter')kirimTestimoniBaru()">
+      <button class="btn solid" onclick="kirimTestimoniBaru()" style="padding: 0 20px; border-radius: 12px;">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WIDGET TESTIMONI POJOK KIRI BAWAH ===== -->
+<div class="testimonial-toast" id="testimonialToast" onclick="bukaPopupTestimoni()" title="Klik untuk lihat & kirim testimoni" aria-live="polite">
+  <div class="testimonial-label"><span>✦</span> TESTIMONI PENGGUNA (KLIK DISINI)</div>
+  <div class="testimonial-name" id="testimonialName"></div>
+  <div class="testimonial-message" id="testimonialMessage"></div>
+</div>
+
+<!-- ===== SUPPORT CHAT 24/7 (BOT-ALI) ===== -->
+<button class="support-fab" onclick="toggleChat()" title="Support 24/7">💬</button>
+<div class="chatbox" id="chatbox">
+  <div class="chathead">
+    <div class="avatar">🤖</div>
+    <div>
+      <div class="cname">BOT-Ali</div>
+      <div class="cstat">● ONLINE — SUPPORT 24/7</div>
+    </div>
+    <button class="closex2" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chatlog" id="chatlog">
+    <div class="msg bot">Hai! 👋 Aku BOT-Ali, support 24/7. Ada yang bisa dibantu? Tulis aja apapun!</div>
+  </div>
+  <div class="chatinput">
+    <input type="text" id="chatMsg" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter')kirimChat()">
+    <button onclick="kirimChat()">➤</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* =========================================================
+     1. PENYIMPANAN DATABASE LOKAL (LOCALSTORAGE)
+     ========================================================= */
+  const STORAGE_KEYS = {
+    USERS: 'ali_db_users',
+    CURRENT_USER: 'ali_current_user',
+    TESTIMONIALS: 'ali_db_testimonials'
+  };
+
+  // Data default testimoni jika database browser masih kosong
+  const defaultTestimonials = [
+    { name: 'TuanBuas', message: 'Terima kasih ali, Overlay STREAM kamu sangat berguna!' },
+    { name: 'WandahBatubara', message: 'Semenjak ada website ALI ini. Youtube saya jadi mencapai 20 JUTA SUBS!' },
+    { name: 'KeanTK', message: 'Ini website terkeren seindonesia, Saya kasih ⭐⭐⭐⭐⭐' },
+    { name: 'JuiceBubir', message: 'Looks like I’m done being a musician ever since this website came along, I think I’ll just become a streamer instead!' },
+    { name: 'NasiGang', message: 'Berkat website ini saya jadi streamer NOMOR 1!!!' },
+    { name: 'LutpaHutanan', message: 'keren banget kamu ALI!!' }
+  ];
+
+  // Memuat database testimoni dari localStorage
+  function loadTestimonials() {
+    const saved = localStorage.getItem(STORAGE_KEYS.TESTIMONIALS);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [...defaultTestimonials];
+      }
+    }
+    localStorage.setItem(STORAGE_KEYS.TESTIMONIALS, JSON.stringify(defaultTestimonials));
+    return [...defaultTestimonials];
+  }
+
+  let testimonials = loadTestimonials();
+
+  // Memuat status user yang sedang login dari localStorage
+  function getCurrentUser() {
+    return localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || '';
+  }
+
+  function updateAuthUI() {
+    const user = getCurrentUser();
+    const guestBox = document.getElementById('guestButtons');
+    const profileBox = document.getElementById('userProfileBox');
+    const nameDisplay = document.getElementById('loggedUsernameDisplay');
+
+    if (user) {
+      guestBox.style.display = 'none';
+      profileBox.style.display = 'inline-flex';
+      nameDisplay.textContent = '👤 ' + user;
+    } else {
+      guestBox.style.display = 'inline';
+      profileBox.style.display = 'none';
+      nameDisplay.textContent = '';
+    }
+  }
+
+  /* ===== FITUR ROTASI & POPUP TESTIMONI ===== */
+  let testimonialIndex = 0;
+  function showTestimonial() {
+    const box = document.getElementById('testimonialToast');
+    if (!box || testimonials.length === 0) return;
+    const item = testimonials[testimonialIndex];
+    document.getElementById('testimonialName').textContent = item.name + ':';
+    document.getElementById('testimonialMessage').textContent = item.message;
+    box.classList.add('show');
+    testimonialIndex = (testimonialIndex + 1) % testimonials.length;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+    showTestimonial();
+    setInterval(showTestimonial, 5500);
+  });
+
+  function bukaPopupTestimoni() {
+    renderTestimoniChatLog();
+    openModal('ovTestimoniChat');
+  }
+
+  function renderTestimoniChatLog() {
+    const logContainer = document.getElementById('testimoniChatLog');
+    if (!logContainer) return;
+    logContainer.innerHTML = testimonials.map(t => 
+      `<div class="testi-bubble">
+         <span class="t-user">${escapeHtml(t.name)}</span>
+         <span>${escapeHtml(t.message)}</span>
+       </div>`
+    ).join('');
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+
+  function kirimTestimoniBaru() {
+    const user = getCurrentUser();
+    if (!user) {
+      closeModal('ovTestimoniChat');
+      openModal('ovLogin');
+      toast('⚠️ Kamu harus Login terlebih dahulu untuk mengirim testimoni!', 'warn');
+      return;
+    }
+
+    const inputField = document.getElementById('inputTestimoniMsg');
+    const pesan = inputField.value.trim();
+    if (!pesan) return;
+
+    // Simpan ke array & ke localStorage secara permanen
+    testimonials.push({ name: user, message: pesan });
+    localStorage.setItem(STORAGE_KEYS.TESTIMONIALS, JSON.stringify(testimonials));
+
+    inputField.value = '';
+    renderTestimoniChatLog();
+    toast('✅ Testimoni berhasil tersimpan permanen di database browser!', 'ok');
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* ===== DAFTAR, LOGIN & LOGOUT DENGAN LOCALSTORAGE ===== */
+  function doDaftar() {
+    const u = document.getElementById('daftarUser').value.trim();
+    const e = document.getElementById('daftarEmail').value.trim();
+    const p = document.getElementById('daftarPass').value.trim();
+    if (!u || !e || !p) { toast('⚠️ Semua kolom harus diisi dulu ya!', 'warn'); return; }
+    if (!e.includes('@')) { toast('⚠️ Format email salah! Harus ada @', 'warn'); return; }
+
+    // Ambil daftar user yang sudah terdaftar dari localStorage
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    if (users.some(acc => acc.username.toLowerCase() === u.toLowerCase())) {
+      toast('⚠️ Username sudah terdaftar! Silakan pilih nama lain.', 'warn');
+      return;
+    }
+
+    // Simpan akun baru ke localStorage
+    users.push({ username: u, email: e, password: p });
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    // Otomatis login setelah daftar
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, u);
+    updateAuthUI();
+
+    document.getElementById('daftarUser').value = '';
+    document.getElementById('daftarEmail').value = '';
+    document.getElementById('daftarPass').value = '';
+
+    closeModal('ovDaftar');
+    showAlert('✅ Akun Tersimpan!', 'Selamat datang ' + u + '! Akunmu telah tersimpan permanen di database browser.', 'ok');
+  }
+
+  function doLogin() {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value.trim();
+    if (!u || !p) { toast('⚠️ Username dan password harus diisi dulu ya!', 'warn'); return; }
+
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    const foundUser = users.find(acc => acc.username === u && acc.password === p);
+
+    if (!foundUser) {
+      toast('⚠️ Username atau password salah, atau akun belum terdaftar!', 'warn');
+      return;
+    }
+
+    // Simpan status login aktif ke localStorage
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, foundUser.username);
+    updateAuthUI();
+
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+
+    closeModal('ovLogin');
+    toast('✅ Berhasil Login sebagai ' + foundUser.username + '!', 'ok');
+  }
+
+  function doLogout() {
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    updateAuthUI();
+    toast('👋 Kamu telah keluar (Logout).', 'ok');
+  }
+
+  /* ===== FUNGSI DASAR LAINNYA ===== */
+  function updateWIB() {
+    const now = new Date();
+    const wib = new Date(now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000);
+    const hari = ['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
+    const bulan = ['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
+    const p = n => String(n).padStart(2,'0');
+    document.getElementById('jam').textContent =
+      p(wib.getHours()) + ':' + p(wib.getMinutes()) + ':' + p(wib.getSeconds()) + ' WIB';
+    document.getElementById('tgl').textContent =
+      hari[wib.getDay()] + ', ' + p(wib.getDate()) + ' ' + bulan[wib.getMonth()] + ' ' + wib.getFullYear();
+  }
+  updateWIB();
+  setInterval(updateWIB, 1000);
+
+  function toggleNotice() {
+    document.getElementById('noticePanel').classList.toggle('show');
+  }
+  document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.notice-wrap');
+    const panel = document.getElementById('noticePanel');
+    if (wrap && panel && !wrap.contains(e.target) && !panel.contains(e.target)) panel.classList.remove('show');
+  });
+
+  function openModal(id)  { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+  function switchModal(from, to) { closeModal(from); openModal(to); }
+  
+  function bukaTool(from, to, txt) {
+    const ov = document.getElementById('loadOverlay');
+    document.getElementById('loadText').textContent = txt || 'MEMUAT...';
+    ov.classList.add('show');
+    setTimeout(() => {
+      ov.classList.remove('show');
+      switchModal(from, to);
+    }, 500);
+  }
+
+  function bukaKartu(txt, fn) {
+    const ov = document.getElementById('loadOverlay');
+    document.getElementById('loadText').textContent = txt;
+    ov.classList.add('show');
+    setTimeout(() => {
+      ov.classList.remove('show');
+      fn();
+    }, 500);
+  }
+
+  function kirimSaran(e) {
+  e.preventDefault();
+  const f = document.getElementById('formSaran');
+  const btn = f.querySelector('button[type=submit]');
+  btn.disabled = true; 
+  btn.textContent = 'MENGIRIM...';
+
+  fetch('https://formsubmit.co/ajax/fajeeinfo@gmail.com', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      nama: f.nama.value,
+      email: f.email.value || 'Tidak diisi',
+      pesan: f.pesan.value,
+      _subject: 'Kritik & Saran baru dari website ALI'
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    closeModal('ovSaran');
+    f.reset();
+    btn.disabled = false; 
+    btn.textContent = '📨 KIRIM SEKARANG';
+    toast('✅ Saran terkirim langsung ke Gmail owner! Terima kasih 🙏', 'ok');
+  })
+  .catch(() => {
+    btn.disabled = false; 
+    btn.textContent = '📨 KIRIM SEKARANG';
+    toast('⚠️ Gagal mengirim! Pastikan website sudah di-upload ke hosting/server.', 'warn');
+  });
+
+  return false;
+}
+
+  function bukaSoon(nama) {
+    document.getElementById('comingName').textContent = nama;
+    openModal('ovComing');
+  }
+
+  document.querySelectorAll('.overlay').forEach(ov =>
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); }));
+
+  let toastTimer;
+  function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  function showAlert(judul, pesan, tipe) {
+    document.getElementById('alertTitle').textContent = judul;
+    document.getElementById('alertMsg').textContent = pesan;
+    openModal('ovAlert');
+  }
+
+  // Kalkulator Rakit PC & Nota
+  const ids = ['cpu','mobo','ram','ssd','gpu','psu','casing','cooler'];
+  const namaKategori = {cpu:'Prosesor', mobo:'Motherboard', ram:'RAM', ssd:'SSD', gpu:'Kartu Grafis', psu:'PSU', casing:'Casing', cooler:'Pendingin'};
+  function val(id) { return parseInt(document.getElementById(id).value) || 0; }
+  function opt(id)  { return document.getElementById(id).selectedOptions[0]; }
+  function rp(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+  function hitung() {
+    let total = 0;
+    ids.forEach(id => total += val(id));
+    document.getElementById('total').textContent = rp(total);
+    cekKompatibel();
+  }
+
+  function cekKompatibel() {
+    const box = document.getElementById('compat');
+    const cpu = opt('cpu'), mobo = opt('mobo'), ram = opt('ram');
+    const errs = [];
+    if (val('cpu') && val('mobo') && cpu.dataset.socket !== mobo.dataset.socket)
+      errs.push('❌ Socket prosesor & motherboard tidak cocok.');
+    if (val('ram') && val('mobo') && ram.dataset.mem !== mobo.dataset.mem)
+      errs.push('❌ Jenis RAM & motherboard tidak cocok.');
+    if (errs.length) { box.className = 'compat err'; box.innerHTML = errs.join('<br>'); }
+    else if (val('cpu') && val('mobo') && val('ram')) { box.className = 'compat ok'; box.innerHTML = '✅ Komponen kompatibel!'; }
+    else { box.className = 'compat'; box.innerHTML = ''; }
+  }
+
+  function keNota() {
+    let total = 0, ada = false;
+    let html = '';
+    ids.forEach(id => {
+      const o = opt(id);
+      const harga = val(id);
+      if (!harga && !(id === 'gpu' && o.value === '0') && !(id === 'cooler' && o.value === '0')) return;
+      if (id === 'gpu' && o.value === '0') return;
+      if (id === 'cooler' && o.value === '0') return;
+      ada = true;
+      total += harga;
+      const nama = o.text.split(' — Rp')[0].trim();
+      const link = o.dataset.link;
+      html += '<div class="nota-item"><div class="ni-l"><div class="ni-cat">' + namaKategori[id] + '</div><div class="ni-name">' + nama + '</div></div><span class="ni-price">' + rp(harga) + '</span>' + (link ? '<a class="btn shopee small" href="' + link + '" target="_blank">Shopee ↗</a>' : '') + '</div>';
+    });
+    if (!ada) { toast('⚠️ Pilih komponen dulu!', 'warn'); return; }
+    document.getElementById('notaList').innerHTML = html;
+    document.getElementById('notaTotal').textContent = rp(total);
+    closeModal('ovRakit');
+    openModal('ovNota');
+  }
+
+  function beliSemua() {
+    const items = [];
+    ids.forEach(id => {
+      const o = opt(id);
+      if (o.dataset.link && (val(id) > 0)) items.push(o.dataset.link);
+    });
+    items.forEach((link, i) => setTimeout(() => window.open(link, '_blank'), i * 400));
+  }
+
+  // BOT-Ali Chat 24/7 (Jeda 4 detik + 5 detik mengetik)
+  function toggleChat() { document.getElementById('chatbox').classList.toggle('show'); }
+  function kirimChat() {
+    const inp = document.getElementById('chatMsg');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    const log = document.getElementById('chatlog');
+    log.insertAdjacentHTML('beforeend', '<div class="msg user"></div>');
+    log.lastElementChild.textContent = txt;
+    inp.value = '';
+    log.scrollTop = log.scrollHeight;
+
+    setTimeout(() => {
+      const typingId = 'typing-' + Date.now();
+      log.insertAdjacentHTML('beforeend', `<div id="${typingId}" class="msg bot typing">BOT-Ali sedang mengetik...</div>`);
+      log.scrollTop = log.scrollHeight;
+
+      setTimeout(() => {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        let b = 'Terimakasih telah menggunakan layanan kami! 🙏 Pesan kamu sudah diterima.';
+        const t = txt.toLowerCase();
+        if (t.includes('halo') || t.includes('hai')) b = 'Halo juga! 👋 Ada yang bisa dibantu?';
+        else if (t.includes('rakit') || t.includes('pc')) b = 'Silakan gunakan menu 🖥️ Rakit PC di halaman utama ya!';
+        else if (t.includes('overlay') || t.includes('obs')) b = 'Overlay generator bisa dipakai gratis melalui menu OBS!';
+
+        log.insertAdjacentHTML('beforeend', '<div class="msg bot"></div>');
+        log.lastElementChild.textContent = b;
+        log.scrollTop = log.scrollHeight;
+      }, 5000);
+    }, 4000);
+  }
+
+  function openSupportModal() { openModal('ovSupport'); }
+  function toggleSupportIdx() {
+    const ok = document.getElementById('supportAgree').checked;
+    const b = document.getElementById('btnSupportIdx');
+    b.disabled = !ok;
+    b.style.opacity = ok ? '1' : '0.5';
+  }
+  function supportNowIdx() {
+    window.open('https://yapp.ink/fadlilaly/tip', '_blank');
+    closeModal('ovSupport');
+  }
+
+  function cekBottleneck() {
+    const cs = parseInt(opt('cpu').dataset.score) || 0;
+    const gs = parseInt(opt('gpu').dataset.score) || 0;
+    const res = document.getElementById('bottres');
+    if (!cs || (!gs || gs <= 10)) {
+      res.classList.add('show');
+      document.getElementById('bnote').textContent = 'Pilih prosesor dan GPU terlebih dahulu!';
+      return;
+    }
+    document.getElementById('fps1080').textContent = '120 FPS';
+    document.getElementById('fps1440').textContent = '90 FPS';
+    document.getElementById('bval').textContent = '5%';
+    document.getElementById('blimit').textContent = 'Seimbang';
+    document.getElementById('bnote').textContent = '💡 Kombinasi CPU dan GPU sudah sangat optimal untuk FiveM.';
+    res.classList.add('show');
+  }
+
+  /* ===== HANDLER UNTUK MENUTUP OVERLAY DARI IFRAME ===== */
+  window.addEventListener('message', (event) => {
+    if (event.data === 'ali-go-home') {
+      // Tutup semua overlay fullscreen (generator)
+      closeModal('ovGen');
+      closeModal('ovCount');
+      closeModal('ovCredits');
+      // Tutup overlay parent jika masih ada
+      closeModal('ovObs');
+      toast('✅ Kembali ke halaman utama', 'ok');
+    }
+  });
+</script>
+</body>
+</html>

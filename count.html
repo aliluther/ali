@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer Generator — OBS Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Montserrat:wght@700;800;900&family=Poppins:wght@700;800;900&family=Inter:wght@700;800;900&family=Roboto:wght@700;900&family=Oswald:wght@700&family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@700&family=Anton&family=Russo+One&family=Audiowide&family=Press+Start+2P&family=Teko:wght@700&family=Rubik:wght@700;800;900&family=Exo+2:wght@700;800;900&family=Righteous&family=Bungee&family=Chakra+Petch:wght@700&family=Staatliches&family=Lilita+One&family=Luckiest+Guy&family=VT323&family=Silkscreen&family=Monoton&family=Titan+One&family=Space+Grotesk:wght@700&display=swap">
+    <script>
+        function goHome() {
+            const ov = document.getElementById('loadOverlay');
+            if (ov) ov.style.display = 'flex';
+            setTimeout(() => {
+                if (ov) ov.style.display = 'none';
+                try { window.parent.postMessage('ali-go-home', '*'); } catch (e) {}
+                try { window.top.postMessage('ali-go-home', '*'); } catch (e) {}
+            }, 500);
+        }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obs: {
+                            bg: '#0a0a14',
+                            panel: '#12121f',
+                            card: '#1a1a2e',
+                            accent: '#6c5ce7',
+                            accentHover: '#8e7cf3',
+                            border: '#2a2a45'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #12121f; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+        .bg-checkerboard {
+            background-color: #111827;
+            background-image:
+                linear-gradient(45deg, #1f2937 25%, transparent 25%),
+                linear-gradient(-45deg, #1f2937 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #1f2937 75%),
+                linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        #timerDigit { transition: color .3s; }
+        @keyframes pulseWarning { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+        .warning-blink { animation: pulseWarning 1s infinite; }
+    </style>
+</head>
+<body class="bg-obs-bg text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-violet-500 selection:text-white">
+
+    <!-- Loading Overlay -->
+    <div id="loadOverlay" style="position:fixed; inset:0; z-index:20000; display:none; align-items:center; justify-content:center; background:rgba(10,10,20,.92);">
+      <div style="text-align:center;">
+        <div style="width:64px; height:64px; margin:0 auto 20px; border-radius:50%; border:5px solid rgba(162,155,254,.2); border-top-color:#a29bfe; animation:spinHome 1s linear infinite;"></div>
+        <div style="font-size:14px; font-weight:700; color:rgba(255,255,255,.85); letter-spacing:1px;">KEMBALI KE HALAMAN UTAMA...</div>
+        <div style="font-size:12px; color:rgba(255,255,255,.45); margin-top:6px;">Mohon tunggu sebentar ya 😊</div>
+      </div>
+    </div>
+    <style>@keyframes spinHome { to { transform:rotate(360deg); } } #loadOverlay.show { display:flex; }</style>
+
+    <!-- Header -->
+    <header class="bg-obs-panel border-b border-obs-border px-6 py-4 flex items-center justify-between shrink-0 shadow-md gap-4">
+        <button onclick="goHome()" class="flex items-center gap-2 px-4 py-2.5 bg-obs-card border border-obs-border hover:border-violet-500 text-gray-300 hover:text-white font-bold text-sm rounded-lg transition-all active:scale-95 cursor-pointer">
+            ← Kembali ke Halaman Utama
+        </button>
+        <div class="hidden md:block flex-1 text-center">
+            <h1 class="text-lg font-black tracking-wide text-white whitespace-nowrap">⏱️ OBS <span class="text-violet-400">Countdown Timer Generator</span></h1>
+            <p class="text-[10px] text-gray-500 font-medium tracking-widest uppercase -mt-0.5">project by ali</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openFullPreviewModal()" class="flex items-center gap-2 px-4 py-2.5 bg-obs-card border border-obs-border hover:border-violet-500 text-gray-200 hover:text-white font-bold text-sm rounded-lg transition-all active:scale-95">
+                🔍 Preview
+            </button>
+            <a href="#" onclick="openDonasiModal(); return false;" class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-sm rounded-lg transition-all shadow-lg shadow-amber-500/25 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Donasi
+            </a>
+            <button id="btnOpenDownloadModal" onclick="openDownloadModal()" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-lg transition-all shadow-lg shadow-emerald-600/25 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download
+            </button>
+        </div>
+    </header>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-20 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-[-10px]">
+        <span>✅</span>
+        <span id="toastMsg" class="text-sm font-medium">Notification</span>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- Left Panel: Custom Settings -->
+        <aside class="w-full lg:w-[450px] xl:w-[480px] bg-obs-panel border-r border-obs-border flex flex-col shrink-0 overflow-y-auto">
+            <div class="p-5 space-y-6">
+
+                <!-- Section 1: Durasi & Kontrol -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        ⏲️ Durasi & Kontrol Timer
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Menit</label>
+                            <input type="number" id="cfgMinutes" value="5" min="0" max="600" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500" oninput="applySettings()">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Detik</label>
+                            <input type="number" id="cfgSeconds" value="0" min="0" max="59" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500" oninput="applySettings()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="startTimer()" class="px-2 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-all active:scale-95">▶ START</button>
+                        <button onclick="pauseTimer()" class="px-2 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition-all active:scale-95">⏸ PAUSE</button>
+                        <button onclick="resetTimer()" class="px-2 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg transition-all active:scale-95">⏹ RESET</button>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 pt-1">
+                        <button onclick="addTime(60)" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all">+1 mnt</button>
+                        <button onclick="addTime(300)" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all">+5 mnt</button>
+                        <button onclick="addTime(-60)" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all">-1 mnt</button>
+                        <button onclick="addTime(-300)" class="px-2 py-1.5 bg-obs-bg border border-obs-border hover:border-violet-500 text-xs text-gray-300 font-semibold rounded-lg transition-all">-5 mnt</button>
+                    </div>
+                    <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                        <span class="text-xs font-medium text-gray-300">Hitung Mundur (Countdown)</span>
+                        <input type="checkbox" id="cfgCountUp" class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="document.querySelector('label span').nextElementSibling; applySettings()">
+                    </label>
+                    <p class="text-[10px] text-gray-500 -mt-2">Centang = <b>Count Up</b> (stopwatch naik dari 00:00). Hilangkan centang untuk hitung mundur.</p>
+                </div>
+
+                <!-- Section 2: Teks Status -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        💬 Teks Status
+                    </h2>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Teks Sebelum Mulai</label>
+                        <input type="text" id="cfgStatusStart" value="STREAM STARTING SOON" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500" oninput="applySettings()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Teks Saat Waktu Habis</label>
+                        <input type="text" id="cfgStatusEnd" value="STREAM IS LIVE NOW!" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-violet-500" oninput="applySettings()">
+                    </div>
+                    <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                        <span class="text-xs font-medium text-gray-300">Tampilkan Teks Status</span>
+                        <input type="checkbox" id="cfgShowStatus" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings()">
+                    </label>
+                </div>
+
+                <!-- Section 3: Font & Ukuran -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        🔤 Gaya Font & Ukuran
+                    </h2>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Gaya Font Timer (20+ Pilihan)</label>
+                        <select id="cfgFontFamily" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500" onchange="applySettings()">
+                            <option value="'Orbitron', sans-serif" selected>Orbitron (Futuristic)</option>
+                            <option value="'Montserrat', sans-serif">Montserrat (Clean Bold)</option>
+                            <option value="'Poppins', sans-serif">Poppins (Modern)</option>
+                            <option value="'Inter', sans-serif">Inter (Minimalist)</option>
+                            <option value="'Roboto', sans-serif">Roboto (Standard)</option>
+                            <option value="'Oswald', sans-serif">Oswald (Tall Condensed)</option>
+                            <option value="'Bebas Neue', sans-serif">Bebas Neue (Streamer Bold)</option>
+                            <option value="'Share Tech Mono', monospace">Share Tech Mono (Gaming Tech)</option>
+                            <option value="'Rajdhani', sans-serif">Rajdhani (Esports Cyber)</option>
+                            <option value="'Anton', sans-serif">Anton (Bold Poster)</option>
+                            <option value="'Russo One', sans-serif">Russo One (Esports Logo)</option>
+                            <option value="'Audiowide', sans-serif">Audiowide (Retro Tech)</option>
+                            <option value="'Press Start 2P', monospace">Press Start 2P (Retro Game)</option>
+                            <option value="'Teko', sans-serif">Teko (Tall Slim)</option>
+                            <option value="'Rubik', sans-serif">Rubik (Rounded)</option>
+                            <option value="'Exo 2', sans-serif">Exo 2 (Sci-Fi)</option>
+                            <option value="'Righteous', sans-serif">Righteous (Retro Display)</option>
+                            <option value="'Bungee', sans-serif">Bungee (Urban Sign)</option>
+                            <option value="'Chakra Petch', sans-serif">Chakra Petch (Techno)</option>
+                            <option value="'Staatliches', sans-serif">Staatliches (Condensed Caps)</option>
+                            <option value="'Lilita One', cursive">Lilita One (Chunky)</option>
+                            <option value="'Luckiest Guy', cursive">Luckiest Guy (Cartoon)</option>
+                            <option value="'VT323', monospace">VT323 (Terminal Retro)</option>
+                            <option value="'Silkscreen', monospace">Silkscreen (Pixel)</option>
+                            <option value="'Monoton', cursive">Monoton (Neon Line)</option>
+                            <option value="'Titan One', cursive">Titan One (Bubble)</option>
+                            <option value="'Space Grotesk', sans-serif">Space Grotesk (Geek Modern)</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Ukuran Timer</label>
+                                <span id="lblTimerSize" class="text-xs text-violet-400 font-mono">120px</span>
+                            </div>
+                            <input type="range" id="cfgTimerSize" min="40" max="400" value="120" class="w-full accent-violet-500" oninput="document.getElementById('lblTimerSize').innerText=this.value+'px'; applySettings();">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-400">Ukuran Status</label>
+                                <span id="lblStatusSize" class="text-xs text-violet-400 font-mono">28px</span>
+                            </div>
+                            <input type="range" id="cfgStatusSize" min="10" max="100" value="28" class="w-full accent-violet-500" oninput="document.getElementById('lblStatusSize').innerText=this.value+'px'; applySettings();">
+                        </div>
+                    </div>
+                    <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                        <span class="text-xs font-medium text-gray-300">Format JAM:MM:SS (01:00:00)</span>
+                        <input type="checkbox" id="cfgShowHours" class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings()">
+                    </label>
+                </div>
+
+                <!-- Section 4: Warna & Glow -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        🎨 Warna & Glow Neon
+                    </h2>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">Preset Warna Cepat</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="presetColor('#00dfd8')" class="h-8 rounded-lg border border-obs-border" style="background:#00dfd8" title="Cyan Neon"></button>
+                            <button onclick="presetColor('#ff007f')" class="h-8 rounded-lg border border-obs-border" style="background:#ff007f" title="Magenta Neon"></button>
+                            <button onclick="presetColor('#ffb703')" class="h-8 rounded-lg border border-obs-border" style="background:#ffb703" title="Gold Glow"></button>
+                            <button onclick="presetColor('#00f5d4')" class="h-8 rounded-lg border border-obs-border" style="background:#00f5d4" title="Emerald"></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Warna Timer</label>
+                            <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                                <input type="color" id="cfgColorTimer" value="#00dfd8" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="document.getElementById('txtColorTimer').value=this.value.toUpperCase(); applySettings();">
+                                <input type="text" id="txtColorTimer" value="#00DFD8" class="w-full bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorTimer').value=this.value; applySettings();">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Warna Status</label>
+                            <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                                <input type="color" id="cfgColorStatus" value="#ffffff" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="document.getElementById('txtColorStatus').value=this.value.toUpperCase(); applySettings();">
+                                <input type="text" id="txtColorStatus" value="#FFFFFF" class="w-full bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorStatus').value=this.value; applySettings();">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-semibold text-gray-400">Intensitas Glow</label>
+                            <span id="lblGlow" class="text-xs text-violet-400 font-mono">20</span>
+                        </div>
+                        <input type="range" id="cfgGlow" min="0" max="60" value="20" class="w-full accent-violet-500" oninput="document.getElementById('lblGlow').innerText=this.value; applySettings();">
+                    </div>
+                    <div class="space-y-2 pt-2 border-t border-obs-border">
+                        <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                            <span class="text-xs font-medium text-gray-300">Warna Merah Saat Waktu Habis (&lt; 1 menit)</span>
+                            <input type="checkbox" id="cfgWarning" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings()">
+                        </label>
+                        <div class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg">
+                            <span class="text-xs font-medium text-gray-300 flex-1">Warna Bahaya:</span>
+                            <input type="color" id="cfgColorWarning" value="#ff3131" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="applySettings();">
+                        </div>
+                        <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                            <span class="text-xs font-medium text-gray-300">Kedip (Blink) Saat Waktu Habis</span>
+                            <input type="checkbox" id="cfgBlink" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings();">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section 5: Background & Posisi -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-4">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        🖼️ Background & Posisi
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Posisi di Layar</label>
+                            <select id="cfgPosition" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500" onchange="applySettings()">
+                                <option value="center" selected>Tengah (Default)</option>
+                                <option value="top-center">Atas Tengah</option>
+                                <option value="top-left">Atas Kiri</option>
+                                <option value="top-right">Atas Kanan</option>
+                                <option value="bottom-center">Bawah Tengah</option>
+                                <option value="bottom-left">Bawah Kiri</option>
+                                <option value="bottom-right">Bawah Kanan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Background Timer</label>
+                            <select id="cfgBgMode" class="w-full bg-obs-bg border border-obs-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500" onchange="applySettings()">
+                                <option value="transparent" selected>Transparan (OBS)</option>
+                                <option value="solid">Warna Solid</option>
+                                <option value="image">Gambar (Local File)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bgColorWrap" class="hidden">
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Warna Background</label>
+                        <div class="flex items-center gap-2 bg-obs-bg border border-obs-border p-1.5 rounded-lg">
+                            <input type="color" id="cfgColorBg" value="#0b0c10" class="w-7 h-7 rounded border-0 cursor-pointer bg-transparent" oninput="applySettings();">
+                            <input type="text" id="txtColorBg" value="#0B0C10" class="w-full bg-transparent text-xs text-white uppercase font-mono focus:outline-none" oninput="document.getElementById('cfgColorBg').value=this.value; applySettings();">
+                        </div>
+                    </div>
+                    <div id="bgImageWrap" class="hidden">
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Gambar Background dari Local File (jpg / png / webp)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="cfgBgFile" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp" class="hidden" onchange="importBgLocal(this)">
+                            <button onclick="document.getElementById('cfgBgFile').click()" class="flex-1 px-3 py-2 bg-obs-bg border border-obs-border hover:border-violet-500 rounded-lg text-xs text-gray-300 font-semibold transition-colors text-left">
+                                📁 Pilih File Gambar dari Komputer...
+                            </button>
+                            <span id="bgImportStatus" class="text-[10px] text-gray-500">belum ada</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">Gambar akan di-embed (base64) ke file overlay hasil download, jadi tidak butuh file gambar lagi.</p>
+                    </div>
+                    <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                        <span class="text-xs font-medium text-gray-300">Kotak Panel Semi-Transparan</span>
+                        <input type="checkbox" id="cfgPanel" class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings()">
+                    </label>
+                    <label class="flex items-center justify-between p-2.5 bg-obs-bg border border-obs-border rounded-lg cursor-pointer">
+                        <span class="text-xs font-medium text-gray-300">Sembunyikan Panel Kontrol dgn Tombol [H]</span>
+                        <input type="checkbox" id="cfgHotkeyH" checked class="w-4 h-4 rounded text-violet-600 focus:ring-0 bg-gray-900 border-gray-700" onchange="applySettings()">
+                    </label>
+                </div>
+
+                <!-- Section 6: Kontrol Keyboard Overlay -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border space-y-2">
+                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        ⌨️ Hotkey di File Overlay
+                    </h2>
+                    <div class="text-xs text-gray-400 space-y-1 p-2.5 bg-obs-bg border border-obs-border rounded-lg">
+                        <p><b class="text-white">S</b> — Start / Pause</p>
+                        <p><b class="text-white">R</b> — Reset ke durasi awal</p>
+                        <p><b class="text-white">H</b> — Sembunyikan / tampilkan panel kontrol</p>
+                        <p><b class="text-white">↑ / ↓</b> — Tambah / kurangi 1 menit</p>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="bg-obs-card p-4 rounded-xl border border-obs-border text-center">
+                    <h2 style="font-size:20px; font-weight:800; color:#fff; margin-bottom:6px;">Support / Donasi</h2>
+                    <p class="text-xs text-gray-400">Dukung project ini agar terus update 🙏</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Preview Area -->
+        <main class="flex-1 flex flex-col min-w-0">
+            <div id="previewViewport" class="flex-1 bg-checkerboard relative overflow-hidden flex items-center justify-center min-h-[420px]">
+                <div id="previewStage" style="width:1920px; height:1080px; position:relative; transform-origin:center center; flex-shrink:0;">
+                <!-- Overlay preview -->
+                <div id="overlayPreview" class="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                    <div id="previewPanel" class="hidden absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 border border-white/10 rounded-xl px-5 py-3 flex gap-3 items-center z-20">
+                        <input type="number" id="pvMin" value="5" min="0" class="w-14 bg-black/40 border border-white/20 rounded px-2 py-1 text-white text-xs"> <span class="text-xs text-gray-300">Mins</span>
+                        <input type="number" id="pvSec" value="0" min="0" max="59" class="w-14 bg-black/40 border border-white/20 rounded px-2 py-1 text-white text-xs"> <span class="text-xs text-gray-300">Secs</span>
+                        <button onclick="startTimer()" class="px-2 py-1 bg-emerald-500 text-black text-xs font-bold rounded">START</button>
+                        <button onclick="pauseTimer()" class="px-2 py-1 bg-amber-500 text-black text-xs font-bold rounded">PAUSE</button>
+                        <button onclick="resetTimer()" class="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">RESET</button>
+                    </div>
+                    <div id="timerDigit" class="font-black leading-none" style="font-family:'Orbitron',sans-serif; font-size:120px; color:#00dfd8; text-shadow:0 0 20px #00dfd8, 0 0 40px #00dfd8; letter-spacing:5px;">05:00</div>
+                    <div id="statusMsg" class="font-bold uppercase" style="font-size:28px; color:#ffffff; letter-spacing:3px; text-shadow:0 0 10px rgba(255,255,255,.5);">STREAM STARTING SOON</div>
+                </div>
+                </div>
+            </div>
+            <div class="bg-obs-panel border-t border-obs-border px-6 py-3 flex items-center justify-between text-xs text-gray-400">
+                <span>Preview Overlay 1920×1080 — background kotak-kotak = transparan di OBS</span>
+                <button onclick="togglePreviewPanel()" class="px-3 py-1.5 bg-obs-card border border-obs-border hover:border-violet-500 rounded-lg font-semibold text-gray-200">🎛️ Toggle Panel Kontrol Preview</button>
+            </div>
+        </main>
+    </div>
+
+<script>
+/* ============ STATE ============ */
+let timeLeft = 300;
+let totalInitial = 300;
+let timerInterval = null;
+let isRunning = false;
+let finished = false;
+let endHideTimeout = null;
+let bgImageData = '';
+
+const $ = id => document.getElementById(id);
+
+function importBgLocal(input) {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        bgImageData = e.target.result;
+        document.getElementById('bgImportStatus').textContent = f.name.length > 18 ? f.name.slice(0,15)+'...' : f.name;
+        applySettings(false);
+    };
+    reader.readAsDataURL(f);
+}
+
+/* ============ SETTINGS ============ */
+function getSettings() {
+    return {
+        minutes: parseInt($('cfgMinutes').value) || 0,
+        seconds: parseInt($('cfgSeconds').value) || 0,
+        countUp: $('cfgCountUp').checked,
+        statusStart: $('cfgStatusStart').value || 'STREAM STARTING SOON',
+        statusEnd: $('cfgStatusEnd').value || 'STREAM IS LIVE NOW!',
+        showStatus: $('cfgShowStatus').checked,
+        font: $('cfgFontFamily').value,
+        timerSize: +$('cfgTimerSize').value,
+        statusSize: +$('cfgStatusSize').value,
+        showHours: $('cfgShowHours').checked,
+        colorTimer: $('cfgColorTimer').value,
+        colorStatus: $('cfgColorStatus').value,
+        glow: +$('cfgGlow').value,
+        warning: $('cfgWarning').checked,
+        colorWarning: $('cfgColorWarning').value,
+        blink: $('cfgBlink').checked,
+        position: $('cfgPosition').value,
+        bgMode: $('cfgBgMode').value,
+        colorBg: $('cfgColorBg').value,
+        bgImage: bgImageData,
+        panel: $('cfgPanel').checked,
+        hotkeyH: $('cfgHotkeyH').checked
+    };
+}
+
+function applySettings(resetTime = true) {
+    const s = getSettings();
+    // Background mode toggle
+    $('bgColorWrap').classList.toggle('hidden', s.bgMode !== 'solid');
+    $('bgImageWrap').classList.toggle('hidden', s.bgMode !== 'image');
+
+    // Preview container position
+    const pos = $('overlayPreview');
+    pos.className = 'absolute inset-0 flex flex-col items-center gap-4';
+    const jc = s.position.includes('center') ? 'justify-center'
+             : s.position.startsWith('top') ? 'justify-start pt-10' : 'justify-end pb-10';
+    const ai = s.position.endsWith('right') ? 'items-end pr-10'
+             : s.position.endsWith('left') ? 'items-start pl-10' : 'items-center';
+    pos.className += ' ' + jc + ' ' + ai;
+
+    // Panel
+    $('previewPanel').classList.toggle('hidden', !s.panel);
+
+    // Timer digit
+    const t = $('timerDigit');
+    t.style.fontFamily = s.font;
+    t.style.fontSize = s.timerSize + 'px';
+    t.style.color = s.colorTimer;
+    t.style.textShadow = s.glow > 0
+        ? `0 0 ${s.glow}px ${s.colorTimer}, 0 0 ${s.glow * 2}px ${s.colorTimer}`
+        : 'none';
+
+    // Status
+    const st = $('statusMsg');
+    st.style.display = s.showStatus ? '' : 'none';
+    st.style.color = s.colorStatus;
+    st.style.fontSize = s.statusSize + 'px';
+    st.textContent = finished ? s.statusEnd : s.statusStart;
+
+    // Preview bg
+    const bgEl = $('overlayPreview');
+    if (s.bgMode === 'solid') {
+        bgEl.style.backgroundColor = s.colorBg;
+        bgEl.style.backgroundImage = 'none';
+    } else if (s.bgMode === 'image' && s.bgImage) {
+        bgEl.style.backgroundColor = 'transparent';
+        bgEl.style.backgroundImage = 'url(' + s.bgImage + ')';
+        bgEl.style.backgroundSize = 'cover';
+        bgEl.style.backgroundPosition = 'center';
+        bgEl.style.backgroundRepeat = 'no-repeat';
+    } else {
+        bgEl.style.backgroundColor = 'transparent';
+        bgEl.style.backgroundImage = 'none';
+    }
+
+    // restore visibility saat setting diubah
+    $('timerDigit').style.display = '';
+    $('statusMsg').style.display = s.showStatus ? '' : 'none';
+    if (endHideTimeout) { clearTimeout(endHideTimeout); endHideTimeout = null; }
+
+    if (resetTime) {
+        totalInitial = s.minutes * 60 + s.seconds;
+        timeLeft = s.countUp ? 0 : totalInitial;
+        finished = false;
+        pauseTimer();
+        updateDisplay();
+    }
+}
+
+function presetColor(c) {
+    $('cfgColorTimer').value = c;
+    $('txtColorTimer').value = c.toUpperCase();
+    applySettings(false);
+}
+
+/* ============ TIMER CORE ============ */
+function formatTime(sec, showHours) {
+    sec = Math.max(0, sec);
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    const mm = m.toString().padStart(2, '0'), ss = s.toString().padStart(2, '0');
+    return showHours ? `${h.toString().padStart(2,'0')}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+function updateDisplay() {
+    const s = getSettings();
+    const displaySec = s.countUp ? timeLeft : timeLeft;
+    const el = $('timerDigit');
+    el.textContent = formatTime(displaySec, s.showHours);
+    // Warning color
+    let col = s.colorTimer;
+    if (s.warning && !s.countUp && timeLeft > 0 && timeLeft <= 60) col = s.colorWarning;
+    if (finished) col = s.colorWarning;
+    el.style.color = col;
+    el.style.textShadow = s.glow > 0 ? `0 0 ${s.glow}px ${col}, 0 0 ${s.glow*2}px ${col}` : 'none';
+    el.classList.toggle('warning-blink', s.blink && (finished || (!s.countUp && timeLeft > 0 && timeLeft <= 10)));
+}
+
+function startTimer() {
+    if (isRunning) return;
+    const s = getSettings();
+    if (!s.countUp && (timeLeft <= 0 || finished)) {
+        timeLeft = totalInitial;
+        finished = false;
+    }
+    if (s.countUp && finished) { timeLeft = 0; finished = false; }
+    isRunning = true;
+    updateDisplay();
+    timerInterval = setInterval(() => {
+        const s2 = getSettings();
+        if (s2.countUp) {
+            timeLeft++;
+            updateDisplay();
+        } else if (timeLeft > 0) {
+            timeLeft--;
+            updateDisplay();
+        }
+        if (!s2.countUp && timeLeft <= 0) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            finished = true;
+            timeLeft = 0;
+            const st = $('statusMsg');
+            st.textContent = s2.statusEnd;
+            updateDisplay();
+            // Setelah 10 detik, sembunyikan total angka & teks sampai direset/refresh
+            if (endHideTimeout) clearTimeout(endHideTimeout);
+            endHideTimeout = setTimeout(() => {
+                $('timerDigit').style.display = 'none';
+                $('statusMsg').style.display = 'none';
+                endHideTimeout = null;
+            }, 10000);
+        }
+    }, 1000);
+}
+
+function pauseTimer() { clearInterval(timerInterval); isRunning = false; }
+
+function resetTimer() {
+    pauseTimer();
+    const s = getSettings();
+    totalInitial = s.minutes * 60 + s.seconds;
+    timeLeft = s.countUp ? 0 : totalInitial;
+    finished = false;
+    if (endHideTimeout) { clearTimeout(endHideTimeout); endHideTimeout = null; }
+    $('timerDigit').style.display = '';
+    $('statusMsg').style.display = s.showStatus ? '' : 'none';
+    $('statusMsg').textContent = s.statusStart;
+    updateDisplay();
+}
+
+function addTime(sec) {
+    timeLeft = Math.max(0, timeLeft + sec);
+    if (!getSettings().countUp) totalInitial = Math.max(totalInitial, timeLeft);
+    finished = false;
+    if (endHideTimeout) { clearTimeout(endHideTimeout); endHideTimeout = null; }
+    $('timerDigit').style.display = '';
+    $('statusMsg').style.display = getSettings().showStatus ? '' : 'none';
+    updateDisplay();
+}
+
+function togglePreviewPanel() {
+    const p = $('previewPanel');
+    p.classList.toggle('hidden');
+}
+
+/* ============ EXPORT: generate standalone overlay HTML ============ */
+function buildOverlayHTML() {
+    const s = getSettings();
+    const posCSS = {
+        'center': 'top:50%;left:50%;transform:translate(-50%,-50%);',
+        'top-center': 'top:6%;left:50%;transform:translateX(-50%);',
+        'top-left': 'top:6%;left:4%;',
+        'top-right': 'top:6%;right:4%;',
+        'bottom-center': 'bottom:6%;left:50%;transform:translateX(-50%);',
+        'bottom-left': 'bottom:6%;left:4%;',
+        'bottom-right': 'bottom:6%;right:4%;'
+    }[s.position];
+
+    const fontsHref = "https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Montserrat:wght@700;800;900&family=Poppins:wght@700;800;900&family=Inter:wght@700;800;900&family=Roboto:wght@700;900&family=Oswald:wght@700&family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@700&family=Anton&family=Russo+One&family=Audiowide&family=Press+Start+2P&family=Teko:wght@700&family=Rubik:wght@700;800;900&family=Exo+2:wght@700;800;900&family=Righteous&family=Bungee&family=Chakra+Petch:wght@700&family=Staatliches&family=Lilita+One&family=Luckiest+Guy&family=VT323&family=Silkscreen&family=Monoton&family=Titan+One&family=Space+Grotesk:wght@700&display=swap";
+
+    return `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Countdown Timer Overlay</title>
+<link rel="stylesheet" href="${fontsHref}">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; width:1920px; height:1080px; overflow:hidden;
+    background:${s.bgMode === 'solid' ? s.colorBg : s.bgMode === 'image' && s.bgImage ? `url(${s.bgImage}) center/cover no-repeat` : 'transparent'}; }
+  .overlay-wrap {
+    position:fixed; ${posCSS}
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+    ${s.panel ? `background:rgba(0,0,0,0.55); padding:24px 40px; border-radius:20px;
+                 border:1px solid rgba(255,255,255,0.1); box-shadow:0 10px 40px rgba(0,0,0,.5);` : ''}
+  }
+  #panel {
+    display:${s.panel ? 'flex' : 'none'}; gap:10px; align-items:center;
+    position:fixed; top:16px; left:50%; transform:translateX(-50%);
+    background:rgba(10,10,20,0.92); padding:12px 20px; border-radius:12px;
+    border:1px solid rgba(255,255,255,0.12); z-index:100;
+  }
+  #panel input { width:60px; background:#12121e; color:#fff; border:1px solid #3d3d5c;
+    padding:6px 8px; border-radius:6px; outline:none; }
+  #panel button { cursor:pointer; padding:6px 12px; border:none; border-radius:6px;
+    font-weight:bold; font-size:12px; }
+  .timer {
+    font-family:${s.font}; font-weight:900; line-height:1;
+    font-size:${s.timerSize}px; letter-spacing:5px; color:${s.colorTimer};
+    text-shadow:${s.glow > 0 ? `0 0 ${s.glow}px ${s.colorTimer}, 0 0 ${s.glow*2}px ${s.colorTimer}` : 'none'};
+  }
+  .status {
+    display:${s.showStatus ? 'block' : 'none'};
+    font-family:${s.font}; font-weight:700; text-transform:uppercase;
+    font-size:${s.statusSize}px; letter-spacing:3px; color:${s.colorStatus};
+    text-align:center;
+  }
+  @keyframes blinkAnim { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+  .blink { animation: blinkAnim 1s infinite; }
+</style>
+</head>
+<body>
+  <div id="panel">
+    <input type="number" id="minInput" value="${s.minutes}" min="0"> <span style="font-size:12px;color:#aaa">Mins</span>
+    <input type="number" id="secInput" value="${s.seconds}" min="0" max="59"> <span style="font-size:12px;color:#aaa">Secs</span>
+    <button style="background:#10b981;color:#000" onclick="startTimer()">START</button>
+    <button style="background:#f59e0b;color:#000" onclick="pauseTimer()">PAUSE</button>
+    <button style="background:#ef4444;color:#fff" onclick="resetTimer()">RESET</button>
+    <button style="background:#3d3d5c;color:#fff" onclick="addTime(60)">+1m</button>
+    <button style="background:#3d3d5c;color:#fff" onclick="addTime(300)">+5m</button>
+    <button style="background:#3d3d5c;color:#fff" onclick="addTime(-60)">-1m</button>
+  </div>
+
+  <div class="overlay-wrap">
+    <div class="timer" id="timerDigit">${formatTime(s.countUp ? 0 : s.minutes*60+s.seconds, s.showHours)}</div>
+    <div class="status" id="statusMsg">${s.statusStart.replace(/</g,'&lt;')}</div>
+  </div>
+
+<script>
+    var timeLeft = ${s.countUp ? 0 : s.minutes*60+s.seconds};
+    var totalInitial = ${s.minutes*60+s.seconds};
+    var timerInterval = null, isRunning = false, finished = false, endHideTimeout = null;
+    var CFG = {
+        countUp: ${s.countUp},
+        statusStart: ${JSON.stringify(s.statusStart)},
+        statusEnd: ${JSON.stringify(s.statusEnd)},
+        showHours: ${s.showHours},
+        colorTimer: '${s.colorTimer}',
+        colorWarning: '${s.colorWarning}',
+        warning: ${s.warning},
+        blink: ${s.blink},
+        glow: ${s.glow},
+        hotkeyH: ${s.hotkeyH}
+    };
+    var digitEl = document.getElementById('timerDigit');
+    var statusEl = document.getElementById('statusMsg');
+
+    function fmt(sec) {
+        sec = Math.max(0, sec);
+        var h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), ss = sec%60;
+        var mm = ('0'+m).slice(-2), s2 = ('0'+ss).slice(-2);
+        return CFG.showHours ? ('0'+h).slice(-2)+':'+mm+':'+s2 : mm+':'+s2;
+    }
+    function paint(col) {
+        digitEl.style.color = col;
+        digitEl.style.textShadow = CFG.glow > 0 ? '0 0 '+CFG.glow+'px '+col+', 0 0 '+(CFG.glow*2)+'px '+col : 'none';
+    }
+    function updateDisplay() {
+        digitEl.textContent = fmt(timeLeft);
+        var col = CFG.colorTimer;
+        if (CFG.warning && !CFG.countUp && timeLeft > 0 && timeLeft <= 60) col = CFG.colorWarning;
+        if (finished) col = CFG.colorWarning;
+        paint(col);
+        digitEl.classList.toggle('blink', CFG.blink && (finished || (!CFG.countUp && timeLeft > 0 && timeLeft <= 10)));
+    }
+    function startTimer() {
+        if (isRunning) return;
+        if (!CFG.countUp && (timeLeft <= 0 || finished)) { timeLeft = totalInitial; finished = false; }
+        if (CFG.countUp && finished) { timeLeft = 0; finished = false; }
+        isRunning = true;
+        updateDisplay();
+        timerInterval = setInterval(function() {
+            if (CFG.countUp) { timeLeft++; updateDisplay(); }
+            else if (timeLeft > 0) { timeLeft--; updateDisplay(); }
+            if (!CFG.countUp && timeLeft <= 0) {
+                clearInterval(timerInterval); isRunning = false; finished = true; timeLeft = 0;
+                statusEl.textContent = CFG.statusEnd;
+                updateDisplay();
+                // Setelah 10 detik, sembunyikan total angka & teks sampai halaman di-refresh / direset
+                if (endHideTimeout) clearTimeout(endHideTimeout);
+                endHideTimeout = setTimeout(function() {
+                    digitEl.style.display = 'none';
+                    statusEl.style.display = 'none';
+                    endHideTimeout = null;
+                }, 10000);
+            }
+        }, 1000);
+    }
+    function pauseTimer() { clearInterval(timerInterval); isRunning = false; }
+    function resetTimer() {
+        pauseTimer();
+        var m = parseInt(document.getElementById('minInput').value) || 0;
+        var s = parseInt(document.getElementById('secInput').value) || 0;
+        totalInitial = m*60 + s;
+        timeLeft = CFG.countUp ? 0 : totalInitial;
+        finished = false;
+        if (endHideTimeout) { clearTimeout(endHideTimeout); endHideTimeout = null; }
+        digitEl.style.display = '';
+        statusEl.style.display = '';
+        statusEl.textContent = CFG.statusStart;
+        updateDisplay();
+    }
+    function addTime(sec) {
+        timeLeft = Math.max(0, timeLeft + sec); finished = false;
+        if (endHideTimeout) { clearTimeout(endHideTimeout); endHideTimeout = null; }
+        digitEl.style.display = '';
+        statusEl.style.display = '';
+        updateDisplay();
+    }
+    document.addEventListener('keydown', function(e) {
+        var k = e.key.toLowerCase();
+        if (k === 's') { isRunning ? pauseTimer() : startTimer(); }
+        else if (k === 'r') { resetTimer(); }
+        else if (k === 'h' && CFG.hotkeyH) {
+            var p = document.getElementById('panel');
+            p.style.display = (p.style.display === 'none') ? 'flex' : 'none';
+        }
+        else if (e.key === 'ArrowUp') { addTime(60); }
+        else if (e.key === 'ArrowDown') { addTime(-60); }
+    });
+    updateDisplay();
+<\/script>
+</body>
+</html>`;
+}
+
+/* ============ PREVIEW SCALE (fit 1920x1080 ke area preview) ============ */
+function fitPreview() {
+    const vp = $('previewViewport'), stage = $('previewStage');
+    if (!vp || !stage) return;
+    const scale = Math.min(vp.clientWidth / 1920, vp.clientHeight / 1080);
+    stage.style.transform = 'scale(' + scale + ')';
+}
+window.addEventListener('resize', fitPreview);
+
+/* ============ EXPORT ACTIONS ============ */
+function showToast(msg) {
+    $('toastMsg').textContent = msg;
+    const t = $('toast');
+    t.classList.remove('opacity-0', 'pointer-events-none');
+    setTimeout(() => t.classList.add('opacity-0', 'pointer-events-none'), 2500);
+}
+
+/* ===== Download Countdown Modal (20 detik, manual unlock setelah 10s) ===== */
+let dlTimerInterval = null;
+let downloadedState = false;
+
+function openDownloadModal() {
+    const modal = document.getElementById('modalDownload');
+    const timerElem = document.getElementById('downloadTimer');
+    const timerUnit = document.getElementById('downloadTimerUnit');
+    const statusTitle = document.getElementById('modalStatusTitle');
+    const btnManual = document.getElementById('btnManualDownload');
+    const btnNotice = document.getElementById('btnManualNotice');
+
+    modal.classList.remove('hidden');
+
+    let timeLeft = 20;
+    downloadedState = false;
+
+    timerElem.innerText = timeLeft;
+    timerUnit.innerText = 'Detik';
+    statusTitle.innerText = 'Menyiapkan Download...';
+
+    btnManual.disabled = true;
+    btnNotice.innerText = '(Tunggu min. 10s)';
+
+    if (dlTimerInterval) clearInterval(dlTimerInterval);
+
+    dlTimerInterval = setInterval(() => {
+        timeLeft--;
+        timerElem.innerText = timeLeft;
+        if (timeLeft <= 10 && btnManual.disabled) {
+            btnManual.disabled = false;
+            btnNotice.innerText = '(Siap Klik)';
+        }
+        if (timeLeft <= 0) {
+            clearInterval(dlTimerInterval);
+            if (!downloadedState) triggerImmediateDownload();
+            statusTitle.innerText = 'File Berhasil Di-download!';
+            timerElem.innerText = '✓';
+            timerUnit.innerText = 'Selesai';
+        }
+    }, 1000);
+}
+
+function closeDownloadModal() {
+    if (dlTimerInterval) clearInterval(dlTimerInterval);
+    document.getElementById('modalDownload').classList.add('hidden');
+}
+
+function triggerImmediateDownload() {
+    downloadedState = true;
+    const code = buildOverlayHTML();
+    const blob = new Blob([code], { type: 'text/html;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'countdown-overlay.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('File countdown-overlay.html berhasil di-download!');
+}
+
+/* ===== Popup Donasi (sukarela + setuju dulu) ===== */
+function openDonasiModal() {
+    document.getElementById('donasiAgree').checked = false;
+    document.getElementById('btnSupportNow').disabled = true;
+    document.getElementById('btnSupportNow').style.opacity = '0.5';
+    document.getElementById('donasiModal').style.display = 'flex';
+}
+function closeDonasiModal() {
+    document.getElementById('donasiModal').style.display = 'none';
+}
+function toggleSupportBtn() {
+    const ok = document.getElementById('donasiAgree').checked;
+    const b = document.getElementById('btnSupportNow');
+    b.disabled = !ok;
+    b.style.opacity = ok ? '1' : '0.5';
+}
+function supportNow() {
+    if (!document.getElementById('donasiAgree').checked) return;
+    window.open('https://yapp.ink/fadlilaly/tip', '_blank');
+    closeDonasiModal();
+}
+
+// ESC closes modals
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDownloadModal(); closeDonasiModal(); closeFullPreviewModal(); }
+});
+
+/* ===== Modal Full Preview 1920x1080 (iframe live overlay) ===== */
+function openFullPreviewModal() {
+    document.getElementById('modalFullPreview').classList.remove('hidden');
+    const frame = document.getElementById('fullPreviewFrame');
+    // Buat blob URL agar overlay berjalan live seperti file hasil download
+    if (frame._blobUrl) URL.revokeObjectURL(frame._blobUrl);
+    const blob = new Blob([buildOverlayHTML()], { type: 'text/html;charset=utf-8;' });
+    frame._blobUrl = URL.createObjectURL(blob);
+    frame.removeAttribute('sandbox');
+    frame.src = frame._blobUrl;
+    // Hitung scale SETELAH modal terlihat (clientWidth sudah valid)
+    requestAnimationFrame(() => { fitFullPreviewFrame(); setTimeout(fitFullPreviewFrame, 60); });
+}
+function closeFullPreviewModal() {
+    const frame = document.getElementById('fullPreviewFrame');
+    frame.src = 'about:blank';
+    document.getElementById('modalFullPreview').classList.add('hidden');
+}
+function fitFullPreviewFrame() {
+    const wrap = document.getElementById('fullPreviewWrap');
+    if (!wrap) return;
+    const scale = Math.min(wrap.clientWidth / 1920, wrap.clientHeight / 1080);
+    const f = document.getElementById('fullPreviewFrame');
+    f.style.transform = 'scale(' + scale + ')';
+}
+window.addEventListener('resize', fitFullPreviewFrame);
+
+/* ============ HOTKEY PREVIEW (di halaman generator) ============ */
+document.addEventListener('keydown', (e) => {
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+    const k = e.key.toLowerCase();
+    if (k === 's') { isRunning ? pauseTimer() : startTimer(); }
+    else if (k === 'r') { resetTimer(); }
+    else if (e.key === 'ArrowUp') { addTime(60); }
+    else if (e.key === 'ArrowDown') { addTime(-60); }
+});
+
+/* ============ INIT ============ */
+applySettings();
+fitPreview();
+</script>
+
+<!-- ===== POPUP DOWNLOAD (countdown 20 detik + tutorial OBS) ===== -->
+<div id="modalDownload" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-obs-panel border border-obs-border w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-center space-y-5 transform transition-all scale-100">
+
+        <button onclick="closeDownloadModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800/80 hover:bg-gray-700 p-1.5 rounded-lg transition-colors" title="Exit / Tutup">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <div class="w-14 h-14 bg-violet-600/20 border border-violet-500/40 rounded-full flex items-center justify-center mx-auto text-violet-400">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        </div>
+
+        <div class="space-y-1">
+            <h3 id="modalStatusTitle" class="text-xl font-extrabold text-white">Menyiapkan Download...</h3>
+            <p class="text-xs text-gray-400">File <code class="text-emerald-400 font-mono bg-emerald-950/60 px-2 py-0.5 rounded">countdown-overlay.html</code> akan terunduh otomatis dalam:</p>
+        </div>
+
+        <div class="bg-obs-card border border-obs-border p-4 rounded-xl flex items-center justify-center gap-3">
+            <span id="downloadTimer" class="text-3xl font-black font-mono text-violet-400 animate-pulse">20</span>
+            <span id="downloadTimerUnit" class="text-sm font-semibold text-gray-300">Detik</span>
+        </div>
+
+        <div class="bg-violet-950/30 border border-violet-800/40 p-4 rounded-xl text-left space-y-2">
+            <p class="text-xs text-gray-300 leading-relaxed">
+                Overlay ini <b>100% gratis</b> buat kamu pakai! Tapi kalau merasa terbantu dan mau apresiasi/support, bisa kirim saweran seikhlasnya ya (tanpa ada paksaan sama sekali) 🙏
+            </p>
+            <a href="https://yapp.ink/fadlilaly/tip" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-lg transition-all shadow-lg shadow-emerald-900/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Support via Yapp Ink
+            </a>
+        </div>
+
+        <div class="bg-obs-card border border-obs-border p-3.5 rounded-xl text-left space-y-2">
+            <h4 class="text-xs font-bold text-gray-200 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Cara Singkat Pasang di OBS:
+            </h4>
+            <ol class="text-xs text-gray-300 space-y-1.5 list-decimal list-inside leading-relaxed">
+                <li>Buka OBS Studio, tambahkan Source baru <b class="text-violet-300">Browser</b>.</li>
+                <li>Centang <b class="text-violet-300">Local File</b> lalu pilih file <code class="text-emerald-400 font-mono bg-black/40 px-1 py-0.5 rounded">countdown-overlay.html</code>.</li>
+                <li>Atur Width: <b class="text-violet-300">1920</b> & Height: <b class="text-violet-300">1080</b>, lalu klik OK.</li>
+            </ol>
+        </div>
+
+        <div class="space-y-2 pt-1 border-t border-obs-border">
+            <button id="btnManualDownload" disabled onclick="triggerImmediateDownload()" class="w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold text-xs rounded-lg transition-all shadow-md">
+                Download Sekarang <span id="btnManualNotice">(Tunggu min. 10s)</span>
+            </button>
+            <button onclick="closeDownloadModal()" class="w-full py-2 text-xs text-gray-400 hover:text-gray-200 font-medium transition-colors">
+                Tutup / Exit
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== POPUP FULL PREVIEW 1920x1080 ===== -->
+<div id="modalFullPreview" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col p-6 items-center justify-center">
+    <div class="w-full flex items-center justify-between mb-4 max-w-7xl">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span> Simulator Full Preview 1920x1080
+        </h3>
+        <button onclick="closeFullPreviewModal()" class="px-4 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-semibold transition-colors">
+            Tutup (Esc)
+        </button>
+    </div>
+    <div id="fullPreviewWrap" class="w-full max-w-7xl flex-1 min-h-0 flex items-center justify-center relative bg-checkerboard rounded-xl border border-gray-700 overflow-hidden shadow-2xl">
+        <iframe id="fullPreviewFrame" style="width:1920px; height:1080px; border:0; transform-origin:center center; background:transparent;"></iframe>
+    </div>
+    <p class="text-[10px] text-gray-500 mt-3">Timer di preview ini bisa langsung dikontrol (START/PAUSE/RESET & hotkey S/R/H) — sama seperti file hasil download.</p>
+</div>
+
+<!-- ===== POPUP DONASI ===== -->
+<div id="donasiModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(5,5,15,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+    <div style="width:100%; max-width:400px; background:rgba(26,26,46,.97); border:1px solid rgba(162,155,254,.35); border-radius:20px; padding:28px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.6);">
+        <div style="font-size:44px; margin-bottom:8px;">💛</div>
+        <h2 style="font-size:20px; font-weight:800; color:#fff; margin-bottom:6px;">Support / Donasi</h2>
+        <p style="font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.65); margin-bottom:14px;">
+            <b style="color:#fff;">Donasi 100% sukarela</b> — tanpa paksaan.<br>Semua fitur tetap <b style="color:#fff;">gratis</b>. 🙏
+        </p>
+        <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); cursor:pointer; text-align:left; margin-bottom:14px;">
+            <input type="checkbox" id="donasiAgree" onchange="toggleSupportBtn()" style="margin-top:2px; width:16px; height:16px; accent-color:#8e7cf3; cursor:pointer;">
+            <span style="font-size:12px; line-height:1.6; color:rgba(255,255,255,.75);">Saya setuju: donasi ini <b style="color:#fff;">sukarela</b> & <b style="color:#fff;">tidak dapat ditarik kembali</b>.</span>
+        </label>
+        <button id="btnSupportNow" disabled style="opacity:.5; width:100%; padding:13px; border:none; border-radius:999px; font-size:14px; font-weight:700; color:#fff; cursor:pointer; background:linear-gradient(90deg,#f59e0b,#f97316); box-shadow:0 4px 18px rgba(245,158,11,.4);" onclick="supportNow()">💛 Support Sekarang</button>
+        <button style="width:100%; margin-top:10px; padding:12px; border-radius:999px; font-size:13px; font-weight:600; color:rgba(255,255,255,.7); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); cursor:pointer;" onclick="closeDonasiModal()">Nanti Saja</button>
+    </div>
+</div>
+</body>
+</html>
