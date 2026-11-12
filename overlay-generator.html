@@ -711,7 +711,6 @@
             if (cfg.position === 'top-left') posCSS = 'top: 30px; left: 30px; text-align: left;';
             if (cfg.position === 'top-right') posCSS = 'top: 30px; right: 30px; text-align: right;';
 
-            const totalDuration = cfg.durSocial + cfg.durTip;
             const numIcons = activePlatforms.length || 1;
             const iconDuration = cfg.durSocial;
 
@@ -752,10 +751,6 @@
                      0px  3px 6px rgba(0, 0, 0, 0.9);
             ` : 'text-shadow: none;';
 
-            const animShowMs = 300; // 0.3s slide up + fade in
-            const animHideMs = 300; // 0.3s fade out
-            const holdMs = (cfg.durSocial * 1000) - animShowMs - animHideMs; // durasi tampil - animasi masuk - animasi keluar
-
             const dynamicStyle = `
                 <style>
                     .overlay-preview-container {
@@ -784,6 +779,7 @@
                     }
 
                     .slide-social-dynamic.exit {
+                        display: flex;
                         animation: slideOut_${cfg.animOut} 0.3s ease-in forwards;
                     }
 
@@ -804,267 +800,32 @@
                     }
 
                     .slide-tip-dynamic.exit {
+                        display: flex;
                         animation: slideOut_${cfg.animOut} 0.3s ease-in forwards;
                     }
 
-                    /* slideUp - In & Out */
-                    @keyframes slideIn_slideUp {
-                        from {
-                            opacity: 0;
-                            transform: translateY(30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-
-                    @keyframes slideOut_slideUp {
-                        from {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: translateY(30px);
-                        }
-                    }
-
-                    /* slideDown - In & Out */
-                    @keyframes slideIn_slideDown {
-                        from {
-                            opacity: 0;
-                            transform: translateY(-30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-
-                    @keyframes slideOut_slideDown {
-                        from {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: translateY(-30px);
-                        }
-                    }
-
-                    /* slideLeft - In & Out */
-                    @keyframes slideIn_slideLeft {
-                        from {
-                            opacity: 0;
-                            transform: translateX(30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
-                    }
-
-                    @keyframes slideOut_slideLeft {
-                        from {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: translateX(30px);
-                        }
-                    }
-
-                    /* slideRight - In & Out */
-                    @keyframes slideIn_slideRight {
-                        from {
-                            opacity: 0;
-                            transform: translateX(-30px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
-                    }
-
-                    @keyframes slideOut_slideRight {
-                        from {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: translateX(-30px);
-                        }
-                    }
-
-                    /* zoom - In & Out */
-                    @keyframes slideIn_zoom {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.8);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                    }
-
-                    @keyframes slideOut_zoom {
-                        from {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: scale(0.8);
-                        }
-                    }
-
-                    /* rotate - In & Out */
-                    @keyframes slideIn_rotate {
-                        from {
-                            opacity: 0;
-                            transform: rotate(-45deg);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: rotate(0deg);
-                        }
-                    }
-
-                    @keyframes slideOut_rotate {
-                        from {
-                            opacity: 1;
-                            transform: rotate(0deg);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: rotate(45deg);
-                        }
-                    }
-
-                    /* elasticBounce - In & Out */
-                    @keyframes slideIn_elasticBounce {
-                        0% {
-                            opacity: 0;
-                            transform: scale(0);
-                        }
-                        50% {
-                            opacity: 1;
-                            transform: scale(1.1);
-                        }
-                        100% {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                    }
-
-                    @keyframes slideOut_elasticBounce {
-                        from {
-                            opacity: 1;
-                        }
-                        to {
-                            opacity: 0;
-                        }
-                    }
-
-                    /* fade - In & Out */
-                    @keyframes slideIn_fade {
-                        from {
-                            opacity: 0;
-                        }
-                        to {
-                            opacity: 1;
-                        }
-                    }
-
-                    @keyframes slideOut_fade {
-                        from {
-                            opacity: 1;
-                        }
-                        to {
-                            opacity: 0;
-                        }
-                    }
-
-                    /* scale - In & Out */
-                    @keyframes slideIn_scale {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.7) translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1) translateY(0);
-                        }
-                    }
-
-                    @keyframes slideOut_scale {
-                        from {
-                            opacity: 1;
-                            transform: scale(1) translateY(0);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: scale(0.7) translateY(20px);
-                        }
-                    }
-
-                    /* flip - In & Out */
-                    @keyframes slideIn_flip {
-                        from {
-                            opacity: 0;
-                            transform: rotateY(90deg);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: rotateY(0deg);
-                        }
-                    }
-
-                    @keyframes slideOut_flip {
-                        from {
-                            opacity: 1;
-                            transform: rotateY(0deg);
-                        }
-                        to {
-                            opacity: 0;
-                            transform: rotateY(-90deg);
-                        }
-                    }
-
-                    /* pulse - In & Out */
-                    @keyframes slideIn_pulse {
-                        0% {
-                            opacity: 0;
-                            transform: scale(0.9);
-                        }
-                        50% {
-                            opacity: 1;
-                            transform: scale(1.05);
-                        }
-                        100% {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                    }
-
-                    @keyframes slideOut_pulse {
-                        0% {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                        50% {
-                            opacity: 0.5;
-                            transform: scale(0.95);
-                        }
-                        100% {
-                            opacity: 0;
-                            transform: scale(0.9);
-                        }
-                    }
+                    @keyframes slideIn_slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+                    @keyframes slideOut_slideUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(30px); } }
+                    @keyframes slideIn_slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+                    @keyframes slideOut_slideDown { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-30px); } }
+                    @keyframes slideIn_slideLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+                    @keyframes slideOut_slideLeft { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+                    @keyframes slideIn_slideRight { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+                    @keyframes slideOut_slideRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+                    @keyframes slideIn_zoom { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+                    @keyframes slideOut_zoom { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.8); } }
+                    @keyframes slideIn_rotate { from { opacity: 0; transform: rotate(-45deg); } to { opacity: 1; transform: rotate(0deg); } }
+                    @keyframes slideOut_rotate { from { opacity: 1; transform: rotate(0deg); } to { opacity: 0; transform: rotate(45deg); } }
+                    @keyframes slideIn_elasticBounce { 0% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+                    @keyframes slideOut_elasticBounce { from { opacity: 1; } to { opacity: 0; } }
+                    @keyframes slideIn_fade { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes slideOut_fade { from { opacity: 1; } to { opacity: 0; } }
+                    @keyframes slideIn_scale { from { opacity: 0; transform: scale(0.7) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+                    @keyframes slideOut_scale { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.7) translateY(20px); } }
+                    @keyframes slideIn_flip { from { opacity: 0; transform: rotateY(90deg); } to { opacity: 1; transform: rotateY(0deg); } }
+                    @keyframes slideOut_flip { from { opacity: 1; transform: rotateY(0deg); } to { opacity: 0; transform: rotateY(-90deg); } }
+                    @keyframes slideIn_pulse { 0% { opacity: 0; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+                    @keyframes slideOut_pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.95); } 100% { opacity: 0; transform: scale(0.9); } }
 
                     .tip-text-dynamic {
                         font-size: ${cfg.fontSize}px;
@@ -1251,15 +1012,16 @@
             position: absolute;
             ${posCSS}
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .slide-social, .slide-tip {
             display: none;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            ${cfg.position.includes('center') ? 'left: 50%; transform: translateX(-50%);' : cfg.position.includes('right') ? 'right: 0;' : 'left: 0;'}
-            ${cfg.position.includes('top') ? 'top: 0;' : 'bottom: 0;'}
+            position: relative;
         }
 
         .slide-social {
